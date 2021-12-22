@@ -1,0 +1,22 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type MarketItem {
+  _id: ID!
+  itemId: String!
+  tokenId: String!
+  tokenUri: String!
+  price: String!
+  seller: String!
+  owner: String!
+}
+
+type Query {
+  marketItems: [MarketItem!]!
+  marketItem(input: FindMarketItemInput!): MarketItem!
+}
+
+input FindMarketItemInput {
+  _id: String!
+}
