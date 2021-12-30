@@ -12,9 +12,24 @@ type MarketItem {
   owner: String!
 }
 
+type Auction {
+  _id: ID!
+  auctionId: String!
+  seller: String!
+  tokenId: String!
+  tokenContract: String!
+  bidder: String!
+  bid: String!
+  startTime: String!
+  endTime: String!
+  reservePrice: String!
+  auctionCurrency: String!
+}
+
 type Query {
   marketItems: [MarketItem!]!
   marketItem(input: FindMarketItemInput!): MarketItem!
+  Auctions: [Auction!]!
 }
 
 input FindMarketItemInput {

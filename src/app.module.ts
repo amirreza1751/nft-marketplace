@@ -5,6 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MarketItemModule } from './market-item/market-item.module';
+import { AuctionController } from './auction/auction.controller';
+import { AuctionModule } from './auction/auction.module';
 
 @Module({
   imports: [
@@ -13,8 +15,9 @@ import { MarketItemModule } from './market-item/market-item.module';
       autoSchemaFile: 'schema.gql'
     }),
     ConfigModule.forRoot(),
-    MarketItemModule],
-  controllers: [AppController],
+    MarketItemModule,
+    AuctionModule],
+  controllers: [AppController, AuctionController],
   providers: [AppService],
 })
 export class AppModule {}
