@@ -8,6 +8,7 @@ import { MarketItemModule } from './market-item/market-item.module';
 import { AuctionController } from './auction/auction.controller';
 import { AuctionModule } from './auction/auction.module';
 import { UserModule } from './user/user.module';
+// import { UserShareModule } from './user-share/user-share.module';
 
 @Module({
   imports: [
@@ -18,7 +19,9 @@ import { UserModule } from './user/user.module';
     ConfigModule.forRoot(),
     MarketItemModule,
     AuctionModule,
-    UserModule],
+    UserModule,
+    // UserShareModule
+  ],
   controllers: [AppController, AuctionController],
   providers: [AppService],
 })

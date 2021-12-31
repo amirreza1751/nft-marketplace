@@ -5,6 +5,8 @@
 type User {
   _id: ID!
   address: String!
+  marketItems: [MarketItem!]!
+  MarketItems: [MarketItem!]!
 }
 
 type MarketItem {
@@ -34,6 +36,7 @@ type Query {
   marketItems: [MarketItem!]!
   marketItem(input: FindMarketItemInput!): MarketItem!
   Auctions: [Auction!]!
+  users: [User!]!
 }
 
 input FindMarketItemInput {
