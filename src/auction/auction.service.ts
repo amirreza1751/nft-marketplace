@@ -27,8 +27,8 @@ export class AuctionService implements OnModuleInit{
         return this.auctionModel.create(auction)
     }
     async onModuleInit(){
-        this.provider = new ethers.providers.WebSocketProvider(process.env.RINKEBY_WEBSOCKET_URL)
-        this.marketContract = new ethers.Contract(process.env.RINKEBY_NFTMARKET_ADDRESS, NFTMarket.abi, this.provider)
+        // this.provider = new ethers.providers.WebSocketProvider(process.env.RINKEBY_WEBSOCKET_URL)
+        // this.marketContract = new ethers.Contract(process.env.RINKEBY_NFTMARKET_ADDRESS, NFTMarket.abi, this.provider)
 
         console.log("listening started...")
             // this.marketContract.on("AuctionCreated", async (auctionId, tokenId, tokenContract, startTime, endTime, reservePrice, seller, auctionCurrency) => {

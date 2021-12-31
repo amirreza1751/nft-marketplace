@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { MarketItemModule } from './market-item/market-item.module';
 import { AuctionController } from './auction/auction.controller';
 import { AuctionModule } from './auction/auction.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { AuctionModule } from './auction/auction.module';
     }),
     ConfigModule.forRoot(),
     MarketItemModule,
-    AuctionModule],
+    AuctionModule,
+    UserModule],
   controllers: [AppController, AuctionController],
   providers: [AppService],
 })

@@ -1,6 +1,7 @@
 import { Field, ID, InputType, ObjectType, } from "@nestjs/graphql";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import * as mongoose from "mongoose";
+import { User } from "src/user/user.model";
 
 export type MarketItemDocument =  MarketItem & mongoose.Document
 @Schema()
@@ -26,16 +27,8 @@ export class MarketItem{
     @Field()
     price: string
 
-    @Prop({required: true})
-    @Field()
-    seller: string
-
-    @Prop({required: true})
-    @Field()
-    owner: string
-
-    // @Field()
-    // sold: boolean
+    @Field(() => User)
+    owner: User
     
 }
 

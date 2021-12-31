@@ -2,14 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  _id: ID!
+  address: String!
+}
+
 type MarketItem {
   _id: ID!
   itemId: String!
   tokenId: String!
   tokenUri: String!
   price: String!
-  seller: String!
-  owner: String!
+  owner: User!
 }
 
 type Auction {
