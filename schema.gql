@@ -9,6 +9,12 @@ type User {
   MarketItems: [MarketItem!]!
 }
 
+type UserShare {
+  _id: ID!
+  account: User!
+  value: Float!
+}
+
 type MarketItem {
   _id: ID!
   itemId: String!
@@ -16,6 +22,8 @@ type MarketItem {
   tokenUri: String!
   price: String!
   owner: User!
+  creators: [UserShare!]!
+  royalties: [UserShare!]!
 }
 
 type Auction {

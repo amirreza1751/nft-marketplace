@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ethers } from 'ethers';
 import { Model } from 'mongoose';
 import { UserService } from 'src/user/user.service';
 import { MarketItem, MarketItemDocument } from './market-item.model';
+import * as NFT from '../contracts/NFT.json'
+
 @Injectable()
-export class MarketItemService {
+export class MarketItemService implements OnModuleInit {
+    private provider: ethers.providers.WebSocketProvider
+    private marketContract: ethers.Contract
 
     constructor(
         @InjectModel(MarketItem.name) private marketItemModel: Model<MarketItemDocument>,
@@ -36,4 +41,15 @@ export class MarketItemService {
         return this.marketItemModel.findOne({owner: ownerId})
     }
 
+    async onModuleInit(){
+        // this.provider = new ethers.providers.WebSocketProvider("http://127.0.0.1:8545")
+        // this.marketContract = new ethers.Contract(process.env.RINKEBY_NFT_ADDRESS, NFT.abi, this.provider)
+
+        // console.log("listening started...")
+        //     this.marketContract.on("Transfer", async (from, to, tokenId) => {
+        //         console.log("transfer created: " + tokenId.toNumber())
+        //         console.log("from: " + from) 
+        //         console.log("to: " + to)
+        //     });
+    }
 }

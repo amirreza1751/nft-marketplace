@@ -27,40 +27,40 @@ export class AuctionService implements OnModuleInit{
         return this.auctionModel.create(auction)
     }
     async onModuleInit(){
-        // this.provider = new ethers.providers.WebSocketProvider(process.env.RINKEBY_WEBSOCKET_URL)
+        console.log(process.env.ENVIRONMENT)
+        // this.provider = new ethers.providers.WebSocketProvider("http://127.0.0.1:8545")
         // this.marketContract = new ethers.Contract(process.env.RINKEBY_NFTMARKET_ADDRESS, NFTMarket.abi, this.provider)
 
-        console.log("listening started...")
-            // this.marketContract.on("AuctionCreated", async (auctionId, tokenId, tokenContract, startTime, endTime, reservePrice, seller, auctionCurrency) => {
-            //     console.log("Auction created: " + tokenId.toNumber()) 
-            let auctionId: string = 'tesssssssst'               
-                let res = await this.findByAuctionId(auctionId)
+        // console.log("listening started...")
+        //     this.marketContract.on("AuctionCreated", async (auctionId, tokenId, tokenContract, startTime, endTime, reservePrice, seller, auctionCurrency) => {
+        //         console.log("Auction created: " + tokenId.toNumber()) 
+        //         let res = await this.findByAuctionId(auctionId.toNumber())
                 
-                if(res){
-                    console.log("auction exists.")
-                    res.tokenId = "tokenId"
-                    res.tokenContract = "tokenContract"
-                    res.startTime = "startTime"
-                    res.endTime = "endTime"
-                    res.reservePrice = "reservePrice"
-                    res.seller = "seller"
-                    res.auctionCurrency = "auctionCurrency"
-                    res.save()
-                    console.log(res)
-                } else {
-                    console.log("auction is new.")
-                    let newAuction = new Auction()
-                    newAuction.auctionId = auctionId
-                    newAuction.tokenId = "tokenId"
-                    newAuction.tokenContract = "tokenContract"
-                    newAuction.startTime = "startTime"
-                    newAuction.endTime = "endTime"
-                    newAuction.reservePrice = "reservePrice"
-                    newAuction.seller = "seller"
-                    newAuction.auctionCurrency = "auctionCurrency"
-                    await this.createAuction(newAuction)
-                    console.log(newAuction)
-                }
-            // });
+        //         if(res){
+        //             console.log("auction exists.")
+        //             res.tokenId = "tokenId"
+        //             res.tokenContract = "tokenContract"
+        //             res.startTime = "startTime"
+        //             res.endTime = "endTime"
+        //             res.reservePrice = "reservePrice"
+        //             res.seller = "seller"
+        //             res.auctionCurrency = "auctionCurrency"
+        //             res.save()
+        //             console.log(res)
+        //         } else {
+        //             console.log("auction is new.")
+        //             let newAuction = new Auction()
+        //             newAuction.auctionId = auctionId.toNumber()
+        //             newAuction.tokenId = tokenId.toNumber()
+        //             newAuction.tokenContract = tokenContract
+        //             newAuction.startTime = startTime.toNumber()
+        //             newAuction.endTime = endTime.toNumber()
+        //             newAuction.reservePrice = reservePrice.toNumber()
+        //             newAuction.seller = seller
+        //             newAuction.auctionCurrency = auctionCurrency
+        //             await this.createAuction(newAuction)
+        //             console.log(newAuction)
+        //         }
+        //     });
     }
 }
