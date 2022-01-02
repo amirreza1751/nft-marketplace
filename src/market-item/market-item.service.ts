@@ -42,14 +42,14 @@ export class MarketItemService implements OnModuleInit {
     }
 
     async onModuleInit(){
-        // this.provider = new ethers.providers.WebSocketProvider("http://127.0.0.1:8545")
-        // this.marketContract = new ethers.Contract(process.env.RINKEBY_NFT_ADDRESS, NFT.abi, this.provider)
+        this.provider = new ethers.providers.WebSocketProvider("http://127.0.0.1:8545")
+        this.marketContract = new ethers.Contract(process.env.RONIA_NFT, NFT.abi, this.provider)
 
-        // console.log("listening started...")
-        //     this.marketContract.on("Transfer", async (from, to, tokenId) => {
-        //         console.log("transfer created: " + tokenId.toNumber())
-        //         console.log("from: " + from) 
-        //         console.log("to: " + to)
-        //     });
+        console.log("listening on transfers started...")
+            this.marketContract.on("Transfer", async (from, to, tokenId) => {
+                console.log("transfer created: " + tokenId.toNumber())
+                console.log("from: " + from) 
+                console.log("to: " + to)
+            });
     }
 }
