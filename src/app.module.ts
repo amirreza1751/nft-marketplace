@@ -10,6 +10,7 @@ import { AuctionModule } from './auction/auction.module';
 import { UserModule } from './user/user.module';
 import { configuration } from '../config/configuration'; // this is new
 // import { UserShareModule } from './user-share/user-share.module';
+import { Erc20Module } from './erc20/erc20.module';
 
 @Module({
   imports: [
@@ -24,9 +25,10 @@ import { configuration } from '../config/configuration'; // this is new
     MarketItemModule,
     AuctionModule,
     UserModule,
+    Erc20Module,
     // UserShareModule
   ],
-  controllers: [AppController, AuctionController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

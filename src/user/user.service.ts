@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { MarketItem } from 'src/market-item/market-item.model';
-import { User, UserDocument } from './user.model';
+import { User, UserDocument, UserModel } from './user.model';
+
+
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>){}
+    constructor(
+        @InjectModel(User.name) private userModel: Model<UserDocument>
+    ){
+    }
     
     async findById(id){
         return this.userModel.findById(id).lean()
@@ -14,6 +18,15 @@ export class UserService {
 
     async findMany(){
         return this.userModel.find().lean()
+    }
+    
+    async findByAddress(_address: string){
+        return this.userModel.findOne({address: _address})
+    }
+
+    async findByAddressOrCreate(_address: string){
+         let res = await this.userModel.findOneAndUpdate({address: _address}, {}, {upsert: true})
+         return this.findByAddress(_address)
     }
 
     async createUser(user: User){

@@ -1,13 +1,13 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ethers } from 'ethers';
 import { Model } from 'mongoose';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { MarketItem, MarketItemDocument } from './market-item.model';
-import * as NFT from '../contracts/NFT.json'
+import * as NFT from '../contracts/NFT.json';
 
 @Injectable()
-export class MarketItemService implements OnModuleInit {
+export class MarketItemService{
     private provider: ethers.providers.WebSocketProvider
     private marketContract: ethers.Contract
 
@@ -21,6 +21,19 @@ export class MarketItemService implements OnModuleInit {
 
     async findById(id){
         return this.marketItemModel.findById(id).lean()
+    }
+
+    async findByTokenIdAndContract(_tokenId: number, _contract: string){
+        return this.marketItemModel.findOne({tokenId: _tokenId, contract: _contract})
+    }
+
+    async findOrCreateByTokenIdAndContract(_tokenId, _contract){
+        await this.marketItemModel.findOneAndUpdate(
+                {tokenId: _tokenId, contract: _contract},
+                {},
+                {upsert: true, strict: false}
+            )
+        return this.findByTokenIdAndContract(_tokenId,_contract)
     }
 
     async createMarketItem(marketItem: MarketItem){
@@ -41,7 +54,7 @@ export class MarketItemService implements OnModuleInit {
         return this.marketItemModel.findOne({owner: ownerId})
     }
 
-    async onModuleInit(){
+    async listen(){
         this.provider = new ethers.providers.WebSocketProvider("http://127.0.0.1:8545")
         this.marketContract = new ethers.Contract(process.env.RONIA_NFT, NFT.abi, this.provider)
 

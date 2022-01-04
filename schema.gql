@@ -9,44 +9,50 @@ type User {
   MarketItems: [MarketItem!]!
 }
 
-type UserShare {
-  _id: ID!
-  account: User!
-  value: Float!
-}
-
 type MarketItem {
   _id: ID!
-  itemId: String!
-  tokenId: String!
+  itemId: Float!
+  tokenId: Float!
+  contract: String!
   tokenUri: String!
-  price: String!
+  price: Float!
   owner: User!
-  creators: [UserShare!]!
-  royalties: [UserShare!]!
+  type: String!
+}
+
+type Erc20 {
+  _id: ID!
+  address: String!
+  name: String!
+  symbol: String!
 }
 
 type Auction {
   _id: ID!
   auctionId: String!
-  seller: String!
-  tokenId: String!
-  tokenContract: String!
-  bidder: String!
-  bid: String!
-  startTime: String!
-  endTime: String!
-  reservePrice: String!
-  auctionCurrency: String!
+  seller: User!
+  marketItem: MarketItem!
+  bidder: User!
+  bid: Float!
+  startTime: Float!
+  endTime: Float!
+  reservePrice: Float!
+  ended: Boolean!
+  auctionCurrency: Erc20!
 }
 
 type Query {
   marketItems: [MarketItem!]!
   marketItem(input: FindMarketItemInput!): MarketItem!
-  Auctions: [Auction!]!
+  auctions: [Auction!]!
+  auction(input: FindAuctionInput!): Auction!
   users: [User!]!
 }
 
 input FindMarketItemInput {
+  _id: String!
+}
+
+input FindAuctionInput {
   _id: String!
 }

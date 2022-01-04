@@ -1,6 +1,6 @@
 import { Resolver, Query, ResolveField, Parent } from '@nestjs/graphql';
-import { MarketItem } from 'src/market-item/market-item.model';
-import { MarketItemService } from 'src/market-item/market-item.service';
+import { MarketItem } from '../market-item/market-item.model';
+import { MarketItemService } from '../market-item/market-item.service';
 import { User } from './user.model';
 import { UserService } from './user.service';
 

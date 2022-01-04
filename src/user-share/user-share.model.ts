@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { Schema, SchemaFactory } from "@nestjs/mongoose";
-import { User } from "src/user/user.model";
+import { User } from "../user/user.model";
 import * as mongoose from "mongoose";
 
 export type UserShareDocument = UserShare & mongoose.Document

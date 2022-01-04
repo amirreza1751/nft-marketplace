@@ -1,6 +1,9 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import * as mongoose from "mongoose";
+import { Erc20 } from "../erc20/erc20.model";
+import { MarketItem } from "../market-item/market-item.model";
+import { User } from "../user/user.model";
 
 export type AuctionDocument = Auction & mongoose.Document
 @Schema()
@@ -9,45 +12,51 @@ export class Auction{
     @Field(()=> ID)
     _id: number
 
-    @Prop({required: true})
+    @Prop()
     @Field()
     auctionId: string
 
-    @Prop({required: true})
-    @Field()
-    seller: string
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+    @Field(() => User)
+    seller: User
 
-    @Prop({required: true})
-    @Field()
-    tokenId: string
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: MarketItem.name })
+    @Field(() => MarketItem)
+    marketItem: MarketItem
 
-    @Prop({required: true})
-    @Field()
-    tokenContract: string
-
-    @Prop()
-    @Field()
-    bidder: string
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+    @Field(() => User)
+    bidder: User
 
     @Prop()
     @Field()
-    bid: string
+    bid: number
 
-    @Prop({required: true})
+    @Prop()
     @Field()
-    startTime: string
+    startTime: number
 
-    @Prop({required: true})
+    @Prop()
     @Field()
-    endTime: string
+    endTime: number
 
-    @Prop({required: true})
+    @Prop()
     @Field()
-    reservePrice: string
+    reservePrice: number
 
-    @Prop({required: true})
+    @Prop()
     @Field()
-    auctionCurrency: string
+    ended: boolean
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Erc20.name })
+    @Field(()=> Erc20)
+    auctionCurrency: Erc20
 }
 
 export const AuctionModel = SchemaFactory.createForClass(Auction)
+
+@InputType()
+export class FindAuctionInput{
+    @Field()
+    _id: string
+}

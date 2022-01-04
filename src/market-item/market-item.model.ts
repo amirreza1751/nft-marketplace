@@ -1,8 +1,8 @@
-import { Field, ID, InputType, ObjectType, } from "@nestjs/graphql";
+import { Field, ID, InputType, Int, ObjectType, } from "@nestjs/graphql";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import * as mongoose from "mongoose";
-import { UserShare } from "src/user-share/user-share.model";
-import { User } from "src/user/user.model";
+import { UserShare } from "../user-share/user-share.model";
+import { User } from "../user/user.model";
 
 export type MarketItemDocument =  MarketItem & mongoose.Document
 @Schema()
@@ -14,11 +14,15 @@ export class MarketItem{
 
     @Prop()
     @Field()
-    itemId: string
+    itemId: number
+    
+    @Prop()
+    @Field()
+    tokenId: number
 
     @Prop()
     @Field()
-    tokenId: string
+    contract: string
 
     @Prop()
     @Field()
@@ -26,19 +30,19 @@ export class MarketItem{
 
     @Prop()
     @Field()
-    price: string
+    price: number
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
     @Field(() => User)
     owner: User
     
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: UserShare.name })
-    @Field(() => [UserShare])
-    creators: UserShare[]
+    @Prop()
+    @Field()
+    type: string
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: UserShare.name })
-    @Field(() => [UserShare])
-    royalties: UserShare[]
+    // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: UserShare.name })
+    // @Field(() => [UserShare])
+    // royalties: UserShare[]
 }
 
 export const MarketItemModel = SchemaFactory.createForClass(MarketItem)
