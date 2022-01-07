@@ -2,57 +2,74 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type Kollection {
   _id: ID!
-  address: String!
-  marketItems: [MarketItem!]!
-  MarketItems: [MarketItem!]!
+  contract: String
+  name: String
+  icon: String
+  type: String
+  logo: String
+  tokens: [Token!]
 }
 
-type MarketItem {
+type User {
   _id: ID!
-  itemId: Float!
-  tokenId: Float!
-  contract: String!
-  tokenUri: String!
-  price: Float!
-  owner: User!
-  type: String!
+  address: String
+  tokens: [Token!]
+}
+
+type Token {
+  _id: ID!
+  tokenId: Float
+  tokenUri: String
+  owner: User
+  kollection: Kollection
 }
 
 type Erc20 {
   _id: ID!
-  address: String!
-  name: String!
-  symbol: String!
+  address: String
+  name: String
+  symbol: String
 }
 
 type Auction {
   _id: ID!
-  auctionId: String!
-  seller: User!
-  marketItem: MarketItem!
-  bidder: User!
-  bid: Float!
-  startTime: Float!
-  endTime: Float!
-  reservePrice: Float!
-  ended: Boolean!
-  auctionCurrency: Erc20!
+  auctionId: String
+  seller: User
+  token: Token
+  bidder: User
+  bid: Float
+  startTime: Float
+  endTime: Float
+  reservePrice: Float
+  ended: Boolean
+  auctionCurrency: Erc20
 }
 
 type Query {
-  marketItems: [MarketItem!]!
-  marketItem(input: FindMarketItemInput!): MarketItem!
+  tokens: [Token!]!
+  token(input: FindTokenInput!): Token!
   auctions: [Auction!]!
   auction(input: FindAuctionInput!): Auction!
   users: [User!]!
+  user(input: FindUserInput!): User!
+  kollections: [Kollection!]!
+  kollection(input: FindKollectionInput!): Kollection!
 }
 
-input FindMarketItemInput {
+input FindTokenInput {
   _id: String!
 }
 
 input FindAuctionInput {
+  _id: String!
+}
+
+input FindUserInput {
+  _id: String!
+}
+
+input FindKollectionInput {
   _id: String!
 }

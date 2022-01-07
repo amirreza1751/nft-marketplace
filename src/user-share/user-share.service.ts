@@ -5,9 +5,12 @@ import { UserShare, UserShareDocument } from './user-share.model';
 
 @Injectable()
 export class UserShareService {
-    constructor(@InjectModel(UserShare.name) private userShareModel: Model<UserShareDocument>){}
+  constructor(
+    @InjectModel(UserShare.name)
+    private userShareModel: Model<UserShareDocument>,
+  ) {}
 
-    async findById(id){
-        return this.userShareModel.findById(id).lean()
-    }
+  async findById(id) {
+    return this.userShareModel.findById(id).lean();
+  }
 }

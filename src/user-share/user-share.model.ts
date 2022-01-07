@@ -1,20 +1,22 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { Schema, SchemaFactory } from "@nestjs/mongoose";
-import { User } from "../user/user.model";
-import * as mongoose from "mongoose";
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { User } from '../user/user.model';
+import * as mongoose from 'mongoose';
 
-export type UserShareDocument = UserShare & mongoose.Document
+export type UserShareDocument = UserShare & mongoose.Document;
 @Schema()
 @ObjectType()
-export class UserShare{
-    
-    @Field(()=> ID)
-    _id: number
+export class UserShare {
+  
+  @Field(() => ID)
+  _id: number;
 
-    @Field(()=> User)
-    account: User
+  @Prop()
+  @Field(() => User, { nullable: true })
+  account: User;
 
-    @Field()
-    value: number
+  @Prop()
+  @Field({ nullable: true })
+  value: number;
 }
-export const UserShareModel = SchemaFactory.createForClass(UserShare)
+export const UserShareModel = SchemaFactory.createForClass(UserShare);

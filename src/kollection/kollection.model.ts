@@ -3,27 +3,43 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Token } from '../token/token.model';
 
-export type UserDocument = User & mongoose.Document;
+export type KollectionDocument = Kollection & mongoose.Document;
+
 @Schema()
 @ObjectType()
-export class User {
-  
+export class Kollection {
   @Field(() => ID)
   _id: number;
 
   @Prop()
   @Field({ nullable: true })
-  address: string;
+  contract: string;
+
+  @Prop()
+  @Field({ nullable: true })
+  name: string;
+
+  @Prop()
+  @Field({ nullable: true })
+  icon: string;
+
+  @Prop()
+  @Field({ nullable: true })
+  type: string;
+
+  @Prop()
+  @Field({ nullable: true })
+  logo: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Token' }] })
   @Field(() => [Token], { nullable: true })
   tokens: Token[];
 }
 
-export const UserModel = SchemaFactory.createForClass(User);
+export const KollectionModel = SchemaFactory.createForClass(Kollection);
 
 @InputType()
-export class FindUserInput {
+export class FindKollectionInput {
   @Field()
   _id: string;
 }
