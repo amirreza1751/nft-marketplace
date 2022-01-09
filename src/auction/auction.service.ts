@@ -20,7 +20,11 @@ export class AuctionService {
     private readonly tokenService: TokenService,
     private readonly erc20Service: Erc20Service,
     private readonly kollectionService: KollectionService
-  ) {}
+  ) {
+    this.provider = new ethers.providers.WebSocketProvider(
+      process.env.NETWORK_WEBSOCKET_URL,
+    );
+  }
 
   async findMany() {
     return this.auctionModel.find().lean();
@@ -53,10 +57,7 @@ export class AuctionService {
     return res
   }
 
-  async listen() {
-    this.provider = new ethers.providers.WebSocketProvider(
-      'http://127.0.0.1:8545',
-    );
+  async listenOnAuctionCreated() {
     this.marketContract = new ethers.Contract(
       process.env.RONIA_MARKET,
       NFTMarket.abi,
@@ -112,4 +113,96 @@ export class AuctionService {
       },
     );
   }
+
+  async listenOnAuctionBidded(){
+    this.marketContract = new ethers.Contract(
+      process.env.RONIA_MARKET,
+      NFTMarket.abi,
+      this.provider,
+    );
+
+    console.log('listening on auctions bidded...');
+    this.marketContract.on(
+      'AuctionBided',
+      async (
+        _auctionId,
+        _sender,
+        _amount,
+        _extended
+      ) => {
+        let sender = await this.userService.findOrCreateByAddress(_sender);
+        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
+        auction.bidder = sender;
+        auction.bid = _amount;
+        auction.save();
+      }
+    );
+  }
+
+  async listenOnAuctionDurationExtended(){
+    this.marketContract = new ethers.Contract(
+      process.env.RONIA_MARKET,
+      NFTMarket.abi,
+      this.provider,
+    );
+
+    console.log('listening on auctions duration extended...');
+    this.marketContract.on(
+      'AuctionDurationExtended',
+      async (
+        _auctionId,
+        _newEndTime,
+        _duration
+      ) => {
+        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
+        auction.endTime = _newEndTime;
+        auction.save();
+      }
+    );
+  }
+
+  async listenOnAuctionUpdated(){
+    this.marketContract = new ethers.Contract(
+      process.env.RONIA_MARKET,
+      NFTMarket.abi,
+      this.provider,
+    );
+
+    console.log('listening on auctions updated...');
+    this.marketContract.on(
+      'AuctionUpdated',
+      async (
+        _auctionId,
+        _reservePrice
+      ) => {
+        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
+        auction.reservePrice = _reservePrice;
+        auction.save();
+      }
+    );
+  }
+
+  async listenOnAuctionEnded(){
+    this.marketContract = new ethers.Contract(
+      process.env.RONIA_MARKET,
+      NFTMarket.abi,
+      this.provider,
+    );
+
+    console.log('listening on auctions ended...');
+    this.marketContract.on(
+      'AuctionEnded',
+      async (
+        _auctionId,
+        _winner,
+        _amount
+      ) => {
+        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
+        auction.ended = true;
+        auction.save();
+      }
+    );
+  }
+
+
 }

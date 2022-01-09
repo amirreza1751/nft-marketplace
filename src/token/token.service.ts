@@ -20,7 +20,11 @@ export class TokenService {
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
     private userService: UserService,
     private kollectionService: KollectionService
-  ) {}
+  ) {
+    this.provider = new ethers.providers.WebSocketProvider(
+      process.env.NETWORK_WEBSOCKET_URL,
+    );
+  }
   
   async findMany(options?) {
     return this.tokenModel.find(options).lean();
@@ -38,10 +42,8 @@ export class TokenService {
     return this.tokenModel.findOne({ owner: ownerId });
   }
 
-  async listen() {
-    this.provider = new ethers.providers.WebSocketProvider(
-      'http://127.0.0.1:8545',
-    );
+  async listenOnTransfer() {
+    
     this.tokenContract = new ethers.Contract(
       process.env.RONIA_NFT,
       NFT.abi,

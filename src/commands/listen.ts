@@ -11,10 +11,14 @@ async function bootstrap() {
   switch (command) {
     case 'listen':
       const tokenService = application.get(TokenService);
-      await tokenService.listen();
+      await tokenService.listenOnTransfer();
 
       const auctionService = application.get(AuctionService);
-      await auctionService.listen();
+      await auctionService.listenOnAuctionCreated();
+      await auctionService.listenOnAuctionBidded();
+      await auctionService.listenOnAuctionDurationExtended();
+      await auctionService.listenOnAuctionEnded();
+      await auctionService.listenOnAuctionUpdated();
 
       break;
     default:
