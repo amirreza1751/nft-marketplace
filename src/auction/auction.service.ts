@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ethers } from 'ethers';
 import { Model } from 'mongoose';
@@ -9,11 +9,13 @@ import { TokenService } from '../token/token.service';
 import { Erc20Service } from '../erc20/erc20.service';
 import { KollectionService } from '../kollection/kollection.service';
 import { Token } from '../token/token.model';
+var Web3 = require('web3');
 
 @Injectable()
-export class AuctionService {
-  private provider: ethers.providers.WebSocketProvider;
-  private marketContract: ethers.Contract;
+export class AuctionService implements OnApplicationBootstrap{
+  private web3;
+  private marketContract;
+
   constructor(
     @InjectModel(Auction.name) private auctionModel: Model<AuctionDocument>,
     private readonly userService: UserService,
@@ -21,11 +23,16 @@ export class AuctionService {
     private readonly erc20Service: Erc20Service,
     private readonly kollectionService: KollectionService
   ) {
-    this.provider = new ethers.providers.WebSocketProvider(
-      process.env.NETWORK_WEBSOCKET_URL,
-    );
+    this.web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.NETWORK_WEBSOCKET_URL));
   }
-
+  onApplicationBootstrap(){
+    console.log("auction module created!")
+    this.listenOnAuctionCreated()
+    // this.listenOnAuctionBidded()
+    // this.listenOnAuctionDurationExtended()
+    // this.listenOnAuctionUpdated()
+    // this.listenOnAuctionEnded()
+  }
   async findMany() {
     return this.auctionModel.find().lean();
   }
@@ -58,37 +65,26 @@ export class AuctionService {
   }
 
   async listenOnAuctionCreated() {
-    this.marketContract = new ethers.Contract(
-      process.env.RONIA_MARKET,
+    this.marketContract = new this.web3.eth.Contract(
       NFTMarket.abi,
-      this.provider,
+      process.env.RONIA_MARKET,
     );
 
     console.log('listening on auctions started...');
-    this.marketContract.on(
-      'AuctionCreated',
-      async (
-        _auctionId,
-        _tokenId,
-        _tokenContract,
-        _startTime,
-        _endTime,
-        _reservePrice,
-        _seller,
-        _auctionCurrency,
-      ) => {
-        console.log('Auction created: ' + _tokenId.toNumber());
-        let seller = await this.userService.findOrCreateByAddress(_seller);
+    this.marketContract.once('AuctionCreated', {}, async (error, auctionCreatedEvent)=>{
+      console.log(auctionCreatedEvent.returnValues)
+        console.log('Auction created: ' + auctionCreatedEvent.returnValues.auctionId);
+        let seller = await this.userService.findOrCreateByAddress(auctionCreatedEvent.returnValues.seller);
         let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT)
         let kollectionTokens = (await kollection.populate('tokens', 'tokenId')).tokens
       let token = kollectionTokens.find(item => {
-        return item.tokenId == _tokenId.toNumber()
+        return item.tokenId == auctionCreatedEvent.returnValues.tokenId
       })
       if(token){
         token.owner = seller
       } else{
         let createdToken: Token = new Token();
-        createdToken.tokenId = _tokenId.toNumber();
+        createdToken.tokenId = auctionCreatedEvent.returnValues.tokenId;
         createdToken.owner = seller;
         createdToken.kollection = kollection;
         // createdToken.tokenUri = _tokenUri; get token URI from contract
@@ -97,15 +93,15 @@ export class AuctionService {
         token = res;
       }
         await kollection.save()
-        let auctionCurrency = await this.erc20Service.findOrCreateByAddress(_auctionCurrency);
-        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
+        let auctionCurrency = await this.erc20Service.findOrCreateByAddress(auctionCreatedEvent.returnValues.auctionCurrency);
+        let auction = await this.findOrCreateByAuctionId(auctionCreatedEvent.returnValues.auctionId);
         auction.seller = seller;
         auction.token = token;
         auction.auctionCurrency = auctionCurrency;
 
-        auction.startTime = _startTime;
-        auction.endTime = _endTime;
-        auction.reservePrice = _reservePrice;
+        auction.startTime = auctionCreatedEvent.returnValues.startTime;
+        auction.endTime = auctionCreatedEvent.returnValues.endTime;
+        auction.reservePrice = auctionCreatedEvent.returnValues.reservePrice;
         auction.ended = false;
         await auction.save();
         console.log(auction);
@@ -115,89 +111,61 @@ export class AuctionService {
   }
 
   async listenOnAuctionBidded(){
-    this.marketContract = new ethers.Contract(
-      process.env.RONIA_MARKET,
+    this.marketContract = new this.web3.eth.Contract(
       NFTMarket.abi,
-      this.provider,
+      process.env.RONIA_MARKET,
     );
 
     console.log('listening on auctions bidded...');
-    this.marketContract.on(
-      'AuctionBided',
-      async (
-        _auctionId,
-        _sender,
-        _amount,
-        _extended
-      ) => {
-        let sender = await this.userService.findOrCreateByAddress(_sender);
-        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
+    this.marketContract.once('AuctionBidded', {}, async (error, auctionBiddedEvent)=>{
+        let sender = await this.userService.findOrCreateByAddress(auctionBiddedEvent.returnValues.sender);
+        let auction = await this.findOrCreateByAuctionId(auctionBiddedEvent.returnValues.auctionId);
         auction.bidder = sender;
-        auction.bid = _amount;
+        auction.bid = auctionBiddedEvent.returnValues.amount;
         auction.save();
       }
     );
   }
 
   async listenOnAuctionDurationExtended(){
-    this.marketContract = new ethers.Contract(
-      process.env.RONIA_MARKET,
+    this.marketContract = new this.web3.eth.Contract(
       NFTMarket.abi,
-      this.provider,
+      process.env.RONIA_MARKET,
     );
 
     console.log('listening on auctions duration extended...');
-    this.marketContract.on(
-      'AuctionDurationExtended',
-      async (
-        _auctionId,
-        _newEndTime,
-        _duration
-      ) => {
-        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
-        auction.endTime = _newEndTime;
+    this.marketContract.once('AuctionDurationExtended', {}, async (error, auctionDurationExtendedEvent)=>{
+        let auction = await this.findOrCreateByAuctionId(auctionDurationExtendedEvent.returnValues.auctionId);
+        auction.endTime = auctionDurationExtendedEvent.returnValues.newEndTime;
         auction.save();
       }
     );
   }
 
   async listenOnAuctionUpdated(){
-    this.marketContract = new ethers.Contract(
-      process.env.RONIA_MARKET,
+    this.marketContract = new this.web3.eth.Contract(
       NFTMarket.abi,
-      this.provider,
+      process.env.RONIA_MARKET,
     );
 
     console.log('listening on auctions updated...');
-    this.marketContract.on(
-      'AuctionUpdated',
-      async (
-        _auctionId,
-        _reservePrice
-      ) => {
-        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
-        auction.reservePrice = _reservePrice;
+    this.marketContract.once('AuctionUpdated', {}, async (error, auctionUpdatedEvent)=>{
+        let auction = await this.findOrCreateByAuctionId(auctionUpdatedEvent.returnValues.auctionId);
+        auction.reservePrice = auctionUpdatedEvent.returnValues.reservePrice;
         auction.save();
       }
     );
   }
 
   async listenOnAuctionEnded(){
-    this.marketContract = new ethers.Contract(
-      process.env.RONIA_MARKET,
+    this.marketContract = new this.web3.eth.Contract(
       NFTMarket.abi,
-      this.provider,
+      process.env.RONIA_MARKET,
     );
 
     console.log('listening on auctions ended...');
-    this.marketContract.on(
-      'AuctionEnded',
-      async (
-        _auctionId,
-        _winner,
-        _amount
-      ) => {
-        let auction = await this.findOrCreateByAuctionId(_auctionId.toNumber());
+    this.marketContract.once('AuctionEnded', {}, async (error, auctionEndedEvent)=>{
+        let auction = await this.findOrCreateByAuctionId(auctionEndedEvent.returnValues.auctionId);
         auction.ended = true;
         auction.save();
       }

@@ -1,6 +1,7 @@
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import { Event } from '../event/event.model';
 import { Kollection } from '../kollection/kollection.model';
 import { UserShare } from '../user-share/user-share.model';
 import { User } from '../user/user.model';
@@ -29,6 +30,10 @@ export class Token {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Kollection.name })
   @Field(() => Kollection, { nullable: true })
   kollection: Kollection;
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }] })
+  @Field(() => [Event], { nullable: true })
+  events: Event[];
 
   // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: UserShare.name })
   // @Field(() => [UserShare], { nullable: true })

@@ -8,6 +8,8 @@ import { User, UserModel } from '../user/user.model';
 import { UserService } from '../user/user.service';
 import { Kollection, KollectionModel } from '../kollection/kollection.model';
 import { KollectionService } from '../kollection/kollection.service';
+import { Event, EventModel } from '../event/event.model';
+import { EventService } from '../event/event.service';
 
 @Module({
   imports: [
@@ -15,9 +17,11 @@ import { KollectionService } from '../kollection/kollection.service';
       { name: Token.name, schema: TokenModel },
       { name: User.name, schema: UserModel },
       { name: Kollection.name, schema: KollectionModel },
+      { name: Event.name, schema: EventModel },
     ]),
   ],
-  providers: [TokenResolver, TokenService, UserService, KollectionService],
+  providers: [TokenResolver, TokenService, UserService, KollectionService, EventService],
   controllers: [TokenController],
+  exports: [TokenResolver, TokenService]
 })
 export class TokenModule {}

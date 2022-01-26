@@ -15,10 +15,10 @@ async function bootstrap() {
 
       const auctionService = application.get(AuctionService);
       await auctionService.listenOnAuctionCreated();
-      await auctionService.listenOnAuctionBidded();
-      await auctionService.listenOnAuctionDurationExtended();
-      await auctionService.listenOnAuctionEnded();
-      await auctionService.listenOnAuctionUpdated();
+      // await auctionService.listenOnAuctionBidded();
+      // await auctionService.listenOnAuctionDurationExtended();
+      // await auctionService.listenOnAuctionEnded();
+      // await auctionService.listenOnAuctionUpdated();
 
       break;
     default:

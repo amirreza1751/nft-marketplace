@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { KollectionService } from './kollection.service';
 import { KollectionResolver } from './kollection.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -7,6 +7,11 @@ import { Kollection, KollectionModel } from './kollection.model';
 import { TokenService } from '../token/token.service';
 import { UserService } from '../user/user.service';
 import { User, UserModel } from '../user/user.model';
+import { EventService } from '../event/event.service';
+import { Event, EventModel } from '../event/event.model';
+import { TokenModule } from 'src/token/token.module';
+import { UserModule } from 'src/user/user.module';
+import { EventModule } from 'src/event/event.module';
 
 @Module({
   imports: [
@@ -14,8 +19,16 @@ import { User, UserModel } from '../user/user.model';
       { name: Kollection.name, schema: KollectionModel },
       { name: Token.name, schema: TokenModel },
       { name: User.name, schema: UserModel },
+      {name: Event.name, schema:EventModel}
     ]),
+    TokenModule,
+    forwardRef(() => UserModule),
+    EventModule
   ],
-  providers: [KollectionService, KollectionResolver, TokenService, UserService],
+  providers: [KollectionService, KollectionResolver],
+  exports: [
+    KollectionService,
+    KollectionResolver
+  ]
 })
 export class KollectionModule {}

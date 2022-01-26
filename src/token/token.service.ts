@@ -1,31 +1,36 @@
 import {
-  Injectable
+  Injectable, OnApplicationBootstrap
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ethers } from 'ethers';
 import { Model } from 'mongoose';
 import { UserService } from '../user/user.service';
 import { Token, TokenDocument } from './token.model';
 import * as NFT from '../contracts/NFT.json';
 import { KollectionService } from '../kollection/kollection.service';
-import { User } from '../user/user.model';
-import { Kollection } from '../kollection/kollection.model';
-
+import { EventService } from '../event/event.service';
+import { Event } from '../event/event.model';
+var Web3 = require('web3');
 @Injectable()
-export class TokenService {
-  private provider: ethers.providers.WebSocketProvider;
-  private tokenContract: ethers.Contract;
+export class TokenService implements OnApplicationBootstrap{
+  private web3;
+  private tokenContract;
 
   constructor(
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
     private userService: UserService,
-    private kollectionService: KollectionService
+    private kollectionService: KollectionService,
+    private eventService: EventService
   ) {
-    this.provider = new ethers.providers.WebSocketProvider(
-      process.env.NETWORK_WEBSOCKET_URL,
-    );
+    this.web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.NETWORK_WEBSOCKET_URL));
+    console.log("test" + this.web3.eth.Contract.transactionBlockTimeout)
+    this.web3.eth.Contract.transactionBlockTimeout = 28800
+    console.log("test" + this.web3.eth.Contract.transactionBlockTimeout)
+
   }
-  
+  onApplicationBootstrap(){
+    console.log("token module created!")
+    this.listenOnTransfer()
+  }
   async findMany(options?) {
     return this.tokenModel.find(options).lean();
   }
@@ -44,63 +49,70 @@ export class TokenService {
 
   async listenOnTransfer() {
     
-    this.tokenContract = new ethers.Contract(
-      process.env.RONIA_NFT,
+    this.tokenContract = new this.web3.eth.Contract(
       NFT.abi,
-      this.provider,
+      process.env.RONIA_NFT
     );
 
     console.log('listening on transfers started...');
-    this.tokenContract.on('Transfer', async (from, to, tokenId) => {
-      console.log('transfer created on tokenId: ' + tokenId.toNumber());
-      console.log('from: ' + from);
-      console.log('to: ' + to);
-      let tokenUri = await this.tokenContract.tokenURI(tokenId.toNumber());
-      console.log(tokenUri);
-
+    this.tokenContract.events.Transfer().on('data', async transferEvent =>{
+      console.log("transfer!!!!")
+      let tokenUri = await this.tokenContract.methods.tokenURI(transferEvent.returnValues.tokenId).call();
+      console.log(tokenUri)
       let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT);
-      console.log("kollection: " + kollection)
-      let owner = await this.userService.findOrCreateByAddress(to)
-      console.log("owner: " + owner)
+      let owner = await this.userService.findOrCreateByAddress(transferEvent.returnValues.to)
       let kollectionTokens = (await kollection.populate('tokens', 'tokenId')).tokens
       let kollectionToken = kollectionTokens.find(item => {
-        return item.tokenId == tokenId.toNumber()
+        return item.tokenId == transferEvent.returnValues.tokenId
       })
-      if(kollectionToken){
-        kollectionToken.owner = owner
-        var res = kollectionToken
-      } else{
-        let createdToken: Token = new Token();
-        createdToken.tokenId = tokenId.toNumber();
-        createdToken.owner = owner;
-        createdToken.kollection = kollection;
-        createdToken.tokenUri = tokenUri;
-        res = await this.createToken(createdToken)
-        kollection.tokens.push(res)
-      }
-      await kollection.save()
-      
-      let formerOwner = await this.userService.findOrCreateByAddress(from)
+
+      let formerOwner = await this.userService.findOrCreateByAddress(transferEvent.returnValues.from)
       let formerOwnerTokens = (await formerOwner.populate('tokens', 'tokenId')).tokens
       let formerOwnerToken = formerOwnerTokens.find(item => {
-        return item.tokenId == tokenId.toNumber()
+        return item.tokenId == transferEvent.returnValues.tokenId
       })
       if(formerOwnerToken){
         formerOwnerTokens.splice(formerOwnerTokens.indexOf(formerOwnerToken), 1);
       }
       await formerOwner.save()
 
+      let event: Event = new Event();
+      event.from = formerOwner;
+      event.to = owner;
+      let createdEvent = await this.eventService.createEvent(event);
+      
+      if(kollectionToken){
+        kollectionToken.owner = owner
+        kollectionToken.events.push(createdEvent)
+        var res = kollectionToken
+      } else{
+        let createdToken: Token = new Token();
+        createdToken.tokenId = transferEvent.returnValues.tokenId;
+        createdToken.owner = owner;
+        createdToken.kollection = kollection;
+        createdToken.tokenUri = tokenUri;
+        createdToken.events = [createdEvent]
+        res = await this.createToken(createdToken)
+        kollection.tokens.push(res)
+      }
+      await kollection.save()
+      
+      createdEvent.token = res;
+      createdEvent.save()
+
 
       let userTokens = (await owner.populate('tokens', 'tokenId')).tokens
       let userToken = userTokens.find(item => {
-        return item.tokenId == tokenId.toNumber()
+        return item.tokenId == transferEvent.returnValues.tokenId
       })
-      console.log("userToken: " + userToken)
       if(!userToken){
         // owner.tokens.push(res);
         userTokens.push(res);
       }
       await owner.save()
+
+      //create event in event table
+
     });
   }
 }

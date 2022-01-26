@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  _id: ID!
+  address: String
+  tokens: [Token!]
+}
+
+type Event {
+  _id: ID!
+  from: User
+  to: User
+  token: Token
+  price: Float
+}
+
 type Kollection {
   _id: ID!
   contract: String
@@ -12,18 +26,13 @@ type Kollection {
   tokens: [Token!]
 }
 
-type User {
-  _id: ID!
-  address: String
-  tokens: [Token!]
-}
-
 type Token {
   _id: ID!
   tokenId: Float
   tokenUri: String
   owner: User
   kollection: Kollection
+  events: [Event!]
 }
 
 type Erc20 {
@@ -56,6 +65,8 @@ type Query {
   user(input: FindUserInput!): User!
   kollections: [Kollection!]!
   kollection(input: FindKollectionInput!): Kollection!
+  events: [Event!]!
+  event(input: FindEventInput!): Event!
 }
 
 input FindTokenInput {
@@ -71,5 +82,9 @@ input FindUserInput {
 }
 
 input FindKollectionInput {
+  _id: String!
+}
+
+input FindEventInput {
   _id: String!
 }

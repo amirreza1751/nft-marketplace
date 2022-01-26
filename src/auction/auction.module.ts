@@ -12,6 +12,13 @@ import { TokenService } from '../token/token.service';
 import { Token, TokenModel } from '../token/token.model';
 import { KollectionService } from '../kollection/kollection.service';
 import { Kollection, KollectionModel } from '../kollection/kollection.model';
+import { EventService } from '../event/event.service';
+import { EventModel } from '../event/event.model';
+import { TokenModule } from 'src/token/token.module';
+import { UserModule } from 'src/user/user.module';
+import { Erc20Module } from 'src/erc20/erc20.module';
+import { KollectionModule } from 'src/kollection/kollection.module';
+import { EventModule } from 'src/event/event.module';
 
 @Module({
   imports: [
@@ -21,16 +28,22 @@ import { Kollection, KollectionModel } from '../kollection/kollection.model';
       { name: Erc20.name, schema: Erc20Model },
       { name: Token.name, schema: TokenModel },
       { name: Kollection.name, schema: KollectionModel },
+      {name: Event.name, schema: EventModel}
     ]),
+    TokenModule,
+    UserModule,
+    Erc20Module,
+    KollectionModule,
+    EventModule
   ],
   providers: [
     AuctionService,
     AuctionResolver,
-    UserService,
-    TokenService,
-    Erc20Service,
-    KollectionService
   ],
   controllers: [AuctionController],
+  exports: [
+    AuctionService,
+    AuctionResolver,
+  ]
 })
 export class AuctionModule {}
