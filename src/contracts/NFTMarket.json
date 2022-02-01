@@ -31,7 +31,7 @@
           "type": "bool"
         }
       ],
-      "name": "AuctionBided",
+      "name": "AuctionBidded",
       "type": "event"
     },
     {
@@ -41,6 +41,12 @@
           "indexed": true,
           "internalType": "uint256",
           "name": "auctionId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "canceledAt",
           "type": "uint256"
         }
       ],
@@ -146,6 +152,12 @@
           "indexed": false,
           "internalType": "uint256",
           "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "endedAt",
           "type": "uint256"
         }
       ],
@@ -334,6 +346,19 @@
           "internalType": "address payable",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "minBidIncrementPercentage",
+      "outputs": [
+        {
+          "internalType": "uint128",
+          "name": "",
+          "type": "uint128"
         }
       ],
       "stateMutability": "view",

@@ -27,3 +27,9 @@ export class FindUserInput {
   @Field()
   _id: string;
 }
+
+@InputType()
+export class FindUserByAddressInput {
+  @Field()
+  address: string;
+}

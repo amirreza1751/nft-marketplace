@@ -26,12 +26,11 @@ export class AuctionService implements OnApplicationBootstrap{
     this.web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.NETWORK_WEBSOCKET_URL));
   }
   onApplicationBootstrap(){
-    console.log("auction module created!")
     this.listenOnAuctionCreated()
-    // this.listenOnAuctionBidded()
-    // this.listenOnAuctionDurationExtended()
-    // this.listenOnAuctionUpdated()
-    // this.listenOnAuctionEnded()
+    this.listenOnAuctionBidded()
+    this.listenOnAuctionDurationExtended()
+    this.listenOnAuctionUpdated()
+    this.listenOnAuctionEnded()
   }
   async findMany() {
     return this.auctionModel.find().lean();
@@ -72,7 +71,6 @@ export class AuctionService implements OnApplicationBootstrap{
 
     console.log('listening on auctions started...');
     this.marketContract.once('AuctionCreated', {}, async (error, auctionCreatedEvent)=>{
-      console.log(auctionCreatedEvent.returnValues)
         console.log('Auction created: ' + auctionCreatedEvent.returnValues.auctionId);
         let seller = await this.userService.findOrCreateByAddress(auctionCreatedEvent.returnValues.seller);
         let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT)
@@ -104,8 +102,6 @@ export class AuctionService implements OnApplicationBootstrap{
         auction.reservePrice = auctionCreatedEvent.returnValues.reservePrice;
         auction.ended = false;
         await auction.save();
-        console.log(auction);
-        console.log(auction.auctionCurrency.address);
       },
     );
   }
@@ -120,6 +116,7 @@ export class AuctionService implements OnApplicationBootstrap{
     this.marketContract.once('AuctionBidded', {}, async (error, auctionBiddedEvent)=>{
         let sender = await this.userService.findOrCreateByAddress(auctionBiddedEvent.returnValues.sender);
         let auction = await this.findOrCreateByAuctionId(auctionBiddedEvent.returnValues.auctionId);
+        console.log(auctionBiddedEvent.returnValues)
         auction.bidder = sender;
         auction.bid = auctionBiddedEvent.returnValues.amount;
         auction.save();

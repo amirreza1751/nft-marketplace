@@ -1,7 +1,7 @@
 import { Resolver, Query, ResolveField, Parent, Args } from '@nestjs/graphql';
 import { Token } from '../token/token.model';
 import { TokenService } from '../token/token.service';
-import { FindUserInput, User } from './user.model';
+import { FindUserByAddressInput, FindUserInput, User } from './user.model';
 import { UserService } from './user.service';
 
 @Resolver(() => User)
@@ -19,6 +19,11 @@ export class UserResolver {
   @Query(() => User)
   async user(@Args('input') { _id }: FindUserInput) {
     return this.userService.findById(_id);
+  }
+
+  @Query(() => User)
+  async userByAddress(@Args('input') { address }: FindUserByAddressInput) {
+    return this.userService.findByAddress(address)
   }
 
   @ResolveField()

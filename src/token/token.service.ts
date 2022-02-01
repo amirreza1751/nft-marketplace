@@ -22,13 +22,8 @@ export class TokenService implements OnApplicationBootstrap{
     private eventService: EventService
   ) {
     this.web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.NETWORK_WEBSOCKET_URL));
-    console.log("test" + this.web3.eth.Contract.transactionBlockTimeout)
-    this.web3.eth.Contract.transactionBlockTimeout = 28800
-    console.log("test" + this.web3.eth.Contract.transactionBlockTimeout)
-
   }
   onApplicationBootstrap(){
-    console.log("token module created!")
     this.listenOnTransfer()
   }
   async findMany(options?) {
@@ -58,7 +53,6 @@ export class TokenService implements OnApplicationBootstrap{
     this.tokenContract.events.Transfer().on('data', async transferEvent =>{
       console.log("transfer!!!!")
       let tokenUri = await this.tokenContract.methods.tokenURI(transferEvent.returnValues.tokenId).call();
-      console.log(tokenUri)
       let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT);
       let owner = await this.userService.findOrCreateByAddress(transferEvent.returnValues.to)
       let kollectionTokens = (await kollection.populate('tokens', 'tokenId')).tokens

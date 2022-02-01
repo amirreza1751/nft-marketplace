@@ -63,6 +63,7 @@ type Query {
   auction(input: FindAuctionInput!): Auction!
   users: [User!]!
   user(input: FindUserInput!): User!
+  userByAddress(input: FindUserByAddressInput!): User!
   kollections: [Kollection!]!
   kollection(input: FindKollectionInput!): Kollection!
   events: [Event!]!
@@ -79,6 +80,10 @@ input FindAuctionInput {
 
 input FindUserInput {
   _id: String!
+}
+
+input FindUserByAddressInput {
+  address: String!
 }
 
 input FindKollectionInput {
