@@ -14,6 +14,7 @@ type Event {
   to: User
   token: Token
   price: Float
+  txHash: String
 }
 
 type Kollection {

@@ -10,8 +10,8 @@ import { KollectionService } from '../kollection/kollection.service';
 import { Kollection, KollectionModel } from '../kollection/kollection.model';
 import { EventService } from '../event/event.service';
 import { Event, EventModel } from '../event/event.model';
-import { TokenModule } from 'src/token/token.module';
-import { KollectionModule } from 'src/kollection/kollection.module';
+import { TokenModule } from '../token/token.module';
+import { KollectionModule } from '../kollection/kollection.module';
 
 @Module({
   imports: [

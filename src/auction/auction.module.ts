@@ -14,11 +14,11 @@ import { KollectionService } from '../kollection/kollection.service';
 import { Kollection, KollectionModel } from '../kollection/kollection.model';
 import { EventService } from '../event/event.service';
 import { Event, EventModel } from '../event/event.model';
-import { TokenModule } from 'src/token/token.module';
-import { UserModule } from 'src/user/user.module';
-import { Erc20Module } from 'src/erc20/erc20.module';
-import { KollectionModule } from 'src/kollection/kollection.module';
-import { EventModule } from 'src/event/event.module';
+import { TokenModule } from '../token/token.module';
+import { UserModule } from '../user/user.module';
+import { Erc20Module } from '../erc20/erc20.module';
+import { KollectionModule } from '../kollection/kollection.module';
+import { EventModule } from '../event/event.module';
 
 @Module({
   imports: [

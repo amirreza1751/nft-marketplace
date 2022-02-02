@@ -12,8 +12,18 @@ import { Event } from '../event/event.model';
 var Web3 = require('web3');
 @Injectable()
 export class TokenService implements OnApplicationBootstrap{
+  private ws: WebSocket;
   private web3;
   private tokenContract;
+  private options = {
+    // Enable auto reconnection
+    reconnect: {
+        auto: true,
+        delay: 2000, // ms
+        maxAttempts: 5,
+        onTimeout: false
+    }
+  };
 
   constructor(
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
@@ -21,10 +31,11 @@ export class TokenService implements OnApplicationBootstrap{
     private kollectionService: KollectionService,
     private eventService: EventService
   ) {
-    this.web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.NETWORK_WEBSOCKET_URL));
+    this.ws = new Web3.providers.WebsocketProvider(process.env.NETWORK_WEBSOCKET_URL, this.options);
+    this.web3 = new Web3(this.ws);
   }
   onApplicationBootstrap(){
-    this.listenOnTransfer()
+    this.listenTransfer()
   }
   async findMany(options?) {
     return this.tokenModel.find(options).lean();
@@ -42,16 +53,19 @@ export class TokenService implements OnApplicationBootstrap{
     return this.tokenModel.findOne({ owner: ownerId });
   }
 
-  async listenOnTransfer() {
-    
+  async listenTransfer() {
     this.tokenContract = new this.web3.eth.Contract(
       NFT.abi,
       process.env.RONIA_NFT
     );
 
-    console.log('listening on transfers started...');
-    this.tokenContract.events.Transfer().on('data', async transferEvent =>{
-      console.log("transfer!!!!")
+    console.log('listening to transfers ...');
+    this.tokenContract.events.Transfer().on("data", async(transferEvent) => {
+      await this.doListenTransfer(transferEvent)
+    });
+  }
+  async doListenTransfer(transferEvent){
+    console.log("transfer!!!! tokenId: " + transferEvent.returnValues.tokenId)
       let tokenUri = await this.tokenContract.methods.tokenURI(transferEvent.returnValues.tokenId).call();
       let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT);
       let owner = await this.userService.findOrCreateByAddress(transferEvent.returnValues.to)
@@ -70,14 +84,15 @@ export class TokenService implements OnApplicationBootstrap{
       }
       await formerOwner.save()
 
-      let event: Event = new Event();
-      event.from = formerOwner;
-      event.to = owner;
-      let createdEvent = await this.eventService.createEvent(event);
+      let createdEvent = await this.eventService.findOrCreateByTxHash(transferEvent.transactionHash);
+      createdEvent.from = formerOwner;
+      createdEvent.to = owner;
       
       if(kollectionToken){
         kollectionToken.owner = owner
-        kollectionToken.events.push(createdEvent)
+        if(!kollectionToken.events)
+          kollectionToken.events = [createdEvent]
+        else kollectionToken.events.push(createdEvent)
         var res = kollectionToken
       } else{
         let createdToken: Token = new Token();
@@ -104,9 +119,16 @@ export class TokenService implements OnApplicationBootstrap{
         userTokens.push(res);
       }
       await owner.save()
-
-      //create event in event table
-
-    });
   }
+  async indexTransfers(){
+    this.tokenContract.getPastEvents('Transfer', {
+      fromBlock: process.env.FROM_BLOCK,
+      toBlock: 'latest'
+    }, async (error, events) => { 
+      for(let i=0; i < events.length; i++){
+        await this.doListenTransfer(events[i])
+      }
+     })
+  }
+
 }

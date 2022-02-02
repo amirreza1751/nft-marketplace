@@ -9,9 +9,9 @@ import { TokenService } from '../token/token.service';
 import { UserService } from '../user/user.service';
 import { KollectionService } from '../kollection/kollection.service';
 import { Kollection, KollectionModel } from '../kollection/kollection.model';
-import { TokenModule } from 'src/token/token.module';
-import { UserModule } from 'src/user/user.module';
-import { KollectionModule } from 'src/kollection/kollection.module';
+import { TokenModule } from '../token/token.module';
+import { UserModule } from '../user/user.module';
+import { KollectionModule } from '../kollection/kollection.module';
 
 @Module({
   imports: [

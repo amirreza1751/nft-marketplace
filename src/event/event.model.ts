@@ -27,6 +27,10 @@ export class Event{
     @Prop()
     @Field({ nullable: true })
     price: number;
+
+    @Prop()
+    @Field({ nullable: true })
+    txHash: string;
 }
 export const EventModel = SchemaFactory.createForClass(Event);
 

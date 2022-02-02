@@ -9,16 +9,16 @@ async function bootstrap() {
   const command = process.argv[2];
 
   switch (command) {
-    case 'listen':
+    case 'index':
       const tokenService = application.get(TokenService);
-      await tokenService.listenOnTransfer();
+      await tokenService.indexTransfers();
 
       const auctionService = application.get(AuctionService);
-      await auctionService.listenOnAuctionCreated();
-      // await auctionService.listenOnAuctionBidded();
-      // await auctionService.listenOnAuctionDurationExtended();
-      // await auctionService.listenOnAuctionEnded();
-      // await auctionService.listenOnAuctionUpdated();
+      await auctionService.indexAuctionCreated();
+      await auctionService.indexAuctionBidded();
+      await auctionService.indexAuctionDurationExtended();
+      await auctionService.indexAuctionUpdated();
+      await auctionService.indexAuctionEnded();
 
       break;
     default:
@@ -26,8 +26,8 @@ async function bootstrap() {
       process.exit(1);
   }
 
-  // await application.close();
-  // process.exit(0);
+  await application.close();
+  process.exit(0);
 }
 
 bootstrap();

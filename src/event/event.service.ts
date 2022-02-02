@@ -18,4 +18,11 @@ export class EventService {
     async createEvent(_event: Event){
         return this.eventModel.create(_event)
     }
+    async findOrCreateByTxHash(_txHash: string){
+        let res = await this.eventModel.findOne({txHash: _txHash})
+        if(!res){
+          res = await this.eventModel.create({txHash: _txHash})
+        }
+        return res
+    }
 }

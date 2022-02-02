@@ -9,9 +9,9 @@ import { UserService } from '../user/user.service';
 import { User, UserModel } from '../user/user.model';
 import { EventService } from '../event/event.service';
 import { Event, EventModel } from '../event/event.model';
-import { TokenModule } from 'src/token/token.module';
-import { UserModule } from 'src/user/user.module';
-import { EventModule } from 'src/event/event.module';
+import { TokenModule } from '../token/token.module';
+import { UserModule } from '../user/user.module';
+import { EventModule } from '../event/event.module';
 
 @Module({
   imports: [
