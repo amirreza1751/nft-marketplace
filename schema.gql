@@ -32,6 +32,7 @@ type Token {
   tokenId: Float
   tokenUri: String
   owner: User
+  creator: User
   kollection: Kollection
   events: [Event!]
 }

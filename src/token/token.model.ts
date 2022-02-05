@@ -26,6 +26,9 @@ export class Token {
   @Field(() => User, { nullable: true })
   owner: User;
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+  @Field(() => User, { nullable: true })
+  creator: User;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Kollection.name })
   @Field(() => Kollection, { nullable: true })

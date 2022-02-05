@@ -10,20 +10,13 @@ import { Erc20Service } from '../erc20/erc20.service';
 import { KollectionService } from '../kollection/kollection.service';
 import { Token } from '../token/token.model';
 var Web3 = require('web3');
+var Web3WsProvider = require('web3-providers-ws');
 
 @Injectable()
 export class AuctionService implements OnApplicationBootstrap{
+  private ws;
   private web3;
   private marketContract;
-  private options = {
-    // Enable auto reconnection
-    reconnect: {
-        auto: true,
-        delay: 2000, // ms
-        maxAttempts: 5,
-        onTimeout: false
-    }
-  };
 
   constructor(
     @InjectModel(Auction.name) private auctionModel: Model<AuctionDocument>,
@@ -32,7 +25,24 @@ export class AuctionService implements OnApplicationBootstrap{
     private readonly erc20Service: Erc20Service,
     private readonly kollectionService: KollectionService
   ) {
-    this.web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.NETWORK_WEBSOCKET_URL));
+    var options = {
+      clientConfig: {
+        // Useful to keep a connection alive
+        keepalive: true,
+        keepaliveInterval: 28000 // ms
+      },
+  
+      // Enable auto reconnection
+      reconnect: {
+          auto: true,
+          delay: 1000, // ms
+          maxAttempts: 5,
+          onTimeout: true
+      }
+  };
+  this.ws = new Web3WsProvider(process.env.NETWORK_WEBSOCKET_URL, options);
+  this.web3 = new Web3();
+  this.web3.setProvider(this.ws)
   }
   async onApplicationBootstrap(){
     this.listenAuctionCreated()

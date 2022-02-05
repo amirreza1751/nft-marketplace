@@ -10,20 +10,12 @@ import { KollectionService } from '../kollection/kollection.service';
 import { EventService } from '../event/event.service';
 import { Event } from '../event/event.model';
 var Web3 = require('web3');
+var Web3WsProvider = require('web3-providers-ws');
 @Injectable()
 export class TokenService implements OnApplicationBootstrap{
-  private ws: WebSocket;
+  private ws;
   private web3;
   private tokenContract;
-  private options = {
-    // Enable auto reconnection
-    reconnect: {
-        auto: true,
-        delay: 2000, // ms
-        maxAttempts: 5,
-        onTimeout: false
-    }
-  };
 
   constructor(
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
@@ -31,10 +23,23 @@ export class TokenService implements OnApplicationBootstrap{
     private kollectionService: KollectionService,
     private eventService: EventService
   ) {
-    this.ws = new Web3.providers.WebsocketProvider(process.env.NETWORK_WEBSOCKET_URL, this.options);
-    this.web3 = new Web3(this.ws);
+    var options = {
+      clientConfig: {
+        keepalive: true,
+        keepaliveInterval: 28000 // ms
+      },
+      reconnect: {
+          auto: true,
+          delay: 1000, // ms
+          maxAttempts: 5,
+          onTimeout: true
+      }
+  };
+    this.ws = new Web3WsProvider(process.env.NETWORK_WEBSOCKET_URL, options);
+    this.web3 = new Web3();
+    this.web3.setProvider(this.ws)
   }
-  onApplicationBootstrap(){
+  async onApplicationBootstrap(){
     this.listenTransfer()
   }
   async findMany(options?) {
@@ -58,7 +63,6 @@ export class TokenService implements OnApplicationBootstrap{
       NFT.abi,
       process.env.RONIA_NFT
     );
-
     console.log('listening to transfers ...');
     this.tokenContract.events.Transfer().on("data", async(transferEvent) => {
       await this.doListenTransfer(transferEvent)
