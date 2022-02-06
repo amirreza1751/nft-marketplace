@@ -22,6 +22,6 @@ Index server of Ronia market place.
 
 9. Install MongoDB server on your machine. It depends on your environment (Windows or Linux). MongoDB Default address has been added to ```src/app.module.ts```.
 
-10. In case you need to run the Ronia Server Project, run ``` npm run start:dev ``` otherwise, you can just start listening to contract events using ``` pm2 start listener.sh --watch ```.
+10. In case you need to run the Ronia Server Project, run ``` npm run start:dev ``` otherwise, you can just start Listening to contract events using ``` pm2 start listener.sh --watch ```.
 
 Download and install ``` pm2``` with ``` npm install pm2 -g ```.

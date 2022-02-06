@@ -1,11 +1,11 @@
 import { MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { EventModel } from 'src/event/event.model';
-import { EventService } from 'src/event/event.service';
-import { Kollection, KollectionModel } from 'src/kollection/kollection.model';
-import { KollectionService } from 'src/kollection/kollection.service';
-import { User, UserModel } from 'src/user/user.model';
-import { UserService } from 'src/user/user.service';
+import { EventModel } from '../event/event.model';
+import { EventService } from '../event/event.service';
+import { Kollection, KollectionModel } from '../kollection/kollection.model';
+import { KollectionService } from '../kollection/kollection.service';
+import { User, UserModel } from '../user/user.model';
+import { UserService } from '../user/user.service';
 import { Token, TokenModel } from './token.model';
 import { TokenResolver } from './token.resolver';
 import { TokenService } from './token.service';

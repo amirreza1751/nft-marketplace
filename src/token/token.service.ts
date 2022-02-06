@@ -63,13 +63,13 @@ export class TokenService implements OnApplicationBootstrap{
       NFT.abi,
       process.env.RONIA_NFT
     );
-    console.log('listening to transfers ...');
+    console.log('Listening to Transfer ...');
     this.tokenContract.events.Transfer().on("data", async(transferEvent) => {
       await this.doListenTransfer(transferEvent)
     });
   }
   async doListenTransfer(transferEvent){
-    console.log("transfer!!!! tokenId: " + transferEvent.returnValues.tokenId)
+    console.log("Transfer! tokenId: " + transferEvent.returnValues.tokenId + " from: " + transferEvent.returnValues.from + " to: " + transferEvent.returnValues.to)
       let tokenUri = await this.tokenContract.methods.tokenURI(transferEvent.returnValues.tokenId).call();
       let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT);
       let owner = await this.userService.findOrCreateByAddress(transferEvent.returnValues.to)
@@ -125,6 +125,7 @@ export class TokenService implements OnApplicationBootstrap{
       await owner.save()
   }
   async indexTransfers(){
+    console.log('Indexing Transfer ...');
     this.tokenContract.getPastEvents('Transfer', {
       fromBlock: process.env.FROM_BLOCK,
       toBlock: 'latest'

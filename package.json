@@ -36,6 +36,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
+    "soft-delete-plugin-mongoose": "^1.0.15",
     "web3": "^1.7.0",
     "web3-providers-ws": "^1.7.0"
   },

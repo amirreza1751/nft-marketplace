@@ -13,6 +13,7 @@ import { configuration } from '../config/configuration'; // this is new
 import { Erc20Module } from './erc20/erc20.module';
 import { KollectionModule } from './kollection/kollection.module';
 import { EventModule } from './event/event.module';
+import { BuyNowModule } from './buy-now/buy-now.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { EventModule } from './event/event.module';
     Erc20Module,
     KollectionModule,
     EventModule,
+    BuyNowModule,
     // UserShareModule
   ],
   controllers: [AppController],

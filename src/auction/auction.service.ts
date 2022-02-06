@@ -9,6 +9,7 @@ import { TokenService } from '../token/token.service';
 import { Erc20Service } from '../erc20/erc20.service';
 import { KollectionService } from '../kollection/kollection.service';
 import { Token } from '../token/token.model';
+import {SoftDeleteModel} from "soft-delete-plugin-mongoose";
 var Web3 = require('web3');
 var Web3WsProvider = require('web3-providers-ws');
 
@@ -19,27 +20,27 @@ export class AuctionService implements OnApplicationBootstrap{
   private marketContract;
 
   constructor(
-    @InjectModel(Auction.name) private auctionModel: Model<AuctionDocument>,
+    @InjectModel(Auction.name) private auctionModel: SoftDeleteModel<AuctionDocument>,
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly erc20Service: Erc20Service,
     private readonly kollectionService: KollectionService
   ) {
-    var options = {
-      clientConfig: {
-        // Useful to keep a connection alive
-        keepalive: true,
-        keepaliveInterval: 28000 // ms
-      },
-  
-      // Enable auto reconnection
-      reconnect: {
-          auto: true,
-          delay: 1000, // ms
-          maxAttempts: 5,
-          onTimeout: true
-      }
-  };
+      var options = {
+        clientConfig: {
+          // Useful to keep a connection alive
+          keepalive: true,
+          keepaliveInterval: 28000 // ms
+        },
+    
+        // Enable auto reconnection
+        reconnect: {
+            auto: true,
+            delay: 1000, // ms
+            maxAttempts: 5,
+            onTimeout: true
+        }
+      };
   this.ws = new Web3WsProvider(process.env.NETWORK_WEBSOCKET_URL, options);
   this.web3 = new Web3();
   this.web3.setProvider(this.ws)
@@ -50,7 +51,7 @@ export class AuctionService implements OnApplicationBootstrap{
     this.listenAuctionDurationExtended()
     this.listenAuctionUpdated()
     this.listenAuctionEnded()
-    this.indexAuctionCreated()
+    this.listenAuctionCanceled()
   }
   async findMany() {
     return this.auctionModel.find().lean();
@@ -67,10 +68,6 @@ export class AuctionService implements OnApplicationBootstrap{
     return this.auctionModel.findOne(options);
   }
 
-  async findByToken(tokenId: number, contract: string) {
-    return await this.auctionModel.findOne().populate('token');
-  }
-
   async createAuction(auction: Auction) {
     return this.auctionModel.create(auction);
   }
@@ -82,6 +79,12 @@ export class AuctionService implements OnApplicationBootstrap{
     }
     return res
   }
+  async removeByAuctionId(id: string) {
+    const filter  = { auctionId: id };
+
+    const deleted = await this.auctionModel.softDelete(filter);
+    return deleted;
+}
 
   async listenAuctionCreated() {
     this.marketContract = new this.web3.eth.Contract(
@@ -89,13 +92,14 @@ export class AuctionService implements OnApplicationBootstrap{
       process.env.RONIA_MARKET,
     );
 
-    console.log('listening to auctions ...');
+    console.log('Listening to AuctionCreated ...');
     this.marketContract.events.AuctionCreated().on("data", async(auctionCreatedEvent) => {
       this.doListenAuctionCreated(auctionCreatedEvent)
     });
   }
 
   async indexAuctionCreated(){
+    console.log('Indexing AuctionCreated ...');
     this.marketContract.getPastEvents('AuctionCreated', {
       fromBlock: process.env.FROM_BLOCK,
       toBlock: 'latest'
@@ -111,21 +115,21 @@ export class AuctionService implements OnApplicationBootstrap{
     let seller = await this.userService.findOrCreateByAddress(auctionCreatedEvent.returnValues.seller);
     let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT)
     let kollectionTokens = (await kollection.populate('tokens', 'tokenId')).tokens
-  let token = kollectionTokens.find(item => {
-    return item.tokenId == auctionCreatedEvent.returnValues.tokenId
-  })
-  if(token){
-    token.owner = seller
-  } else{
-    let createdToken: Token = new Token();
-    createdToken.tokenId = auctionCreatedEvent.returnValues.tokenId;
-    createdToken.owner = seller;
-    createdToken.kollection = kollection;
-    // createdToken.tokenUri = _tokenUri; get token URI from contract
-    let res = await this.tokenService.createToken(createdToken)
-    kollection.tokens.push(res)
-    token = res;
-  }
+    let token = kollectionTokens.find(item => {
+      return item.tokenId == auctionCreatedEvent.returnValues.tokenId
+    })
+    if(token){
+      token.owner = seller
+    } else{
+      let createdToken: Token = new Token();
+      createdToken.tokenId = auctionCreatedEvent.returnValues.tokenId;
+      createdToken.owner = seller;
+      createdToken.kollection = kollection;
+      // createdToken.tokenUri = _tokenUri; get token URI from contract
+      let res = await this.tokenService.createToken(createdToken)
+      kollection.tokens.push(res)
+      token = res;
+    }
     await kollection.save()
     let auctionCurrency = await this.erc20Service.findOrCreateByAddress(auctionCreatedEvent.returnValues.auctionCurrency);
     let auction = await this.findOrCreateByAuctionId(auctionCreatedEvent.returnValues.auctionId);
@@ -146,13 +150,14 @@ export class AuctionService implements OnApplicationBootstrap{
       process.env.RONIA_MARKET,
     );
 
-    console.log('listening to auctions bidded...');
+    console.log('Listening to AuctionBidded...');
     this.marketContract.events.AuctionBidded().on("data", async (auctionBiddedEvent)=>{
         this.doListenAuctionBidded(auctionBiddedEvent)
     });
   }
 
   async indexAuctionBidded(){
+    console.log('Indexing AuctionBidded ...');
     this.marketContract.getPastEvents('AuctionBidded', {
       fromBlock: process.env.FROM_BLOCK,
       toBlock: 'latest'
@@ -179,7 +184,7 @@ export class AuctionService implements OnApplicationBootstrap{
       process.env.RONIA_MARKET,
     );
 
-    console.log('listening to auctions duration extended...');
+    console.log('Listening to AuctionDurationExtended...');
     this.marketContract.events.AuctionDurationExtended().on("data", async (auctionDurationExtendedEvent)=>{
         this.doListenAuctionDurationExtended(auctionDurationExtendedEvent)
       }
@@ -187,6 +192,7 @@ export class AuctionService implements OnApplicationBootstrap{
   }
 
   async indexAuctionDurationExtended(){
+    console.log('Indexing AuctionDurationExtended ...');
     this.marketContract.getPastEvents('AuctionDurationExtended', {
       fromBlock: process.env.FROM_BLOCK,
       toBlock: 'latest'
@@ -209,13 +215,14 @@ export class AuctionService implements OnApplicationBootstrap{
       process.env.RONIA_MARKET,
     );
 
-    console.log('listening to auctions updated...');
+    console.log('Listening to AuctionUpdated...');
     this.marketContract.events.AuctionUpdated().on("data", async (auctionUpdatedEvent)=>{
       this.doListenAuctionUpdated(auctionUpdatedEvent)
     });
   }
 
   async indexAuctionUpdated(){
+    console.log('Indexing AuctionUpdated ...');
     this.marketContract.getPastEvents('AuctionUpdated', {
       fromBlock: process.env.FROM_BLOCK,
       toBlock: 'latest'
@@ -238,13 +245,14 @@ export class AuctionService implements OnApplicationBootstrap{
       process.env.RONIA_MARKET,
     );
 
-    console.log('listening to auctions ended...');
+    console.log('Listening to AuctionEnded...');
     this.marketContract.events.AuctionEnded().on("data", async (auctionEndedEvent)=>{
       this.doListenAuctionEnded(auctionEndedEvent)
     });
   }
 
   async indexAuctionEnded(){
+    console.log('Indexing AuctionEnded ...');
     this.marketContract.getPastEvents('AuctionEnded', {
       fromBlock: process.env.FROM_BLOCK,
       toBlock: 'latest'
@@ -260,5 +268,33 @@ export class AuctionService implements OnApplicationBootstrap{
     auction.ended = true;
     auction.save();
   }
+
+  async listenAuctionCanceled() {
+    console.log("Listening to AuctionCanceled...") 
+    this.marketContract = new this.web3.eth.Contract(
+      NFTMarket.abi,
+      process.env.RONIA_MARKET,
+    );
+
+    this.marketContract.events.AuctionCanceled().on("data", async(auctionCanceledEvent) => {
+      this.doListenAuctionCanceled(auctionCanceledEvent)
+    });
+}
+
+async indexAuctionCanceled(){
+    console.log("Indexing AuctionCanceled...")
+    this.marketContract.getPastEvents('AuctionCanceled', {
+      fromBlock: process.env.FROM_BLOCK,
+      toBlock: 'latest'
+    }, async (error, events) => { 
+      for(let i=0; i < events.length; i++){
+        await this.doListenAuctionCanceled(events[i])
+      }
+     })
+}
+
+async doListenAuctionCanceled(auctionCanceledEvent){
+    await this.removeByAuctionId(auctionCanceledEvent.returnValues.auctionId)
+}
 
 }
