@@ -105,6 +105,8 @@ export class TokenService implements OnApplicationBootstrap{
         createdToken.kollection = kollection;
         createdToken.tokenUri = tokenUri;
         createdToken.events = [createdEvent]
+        if(transferEvent.returnValues.from == "0x0000000000000000000000000000000000000000")
+          createdToken.creator = owner;
         res = await this.createToken(createdToken)
         kollection.tokens.push(res)
       }

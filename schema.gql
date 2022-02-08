@@ -6,6 +6,8 @@ type User {
   _id: ID!
   address: String
   tokens: [Token!]
+  ownedTokens: [Token!]!
+  createdTokens: [Token!]!
 }
 
 type Event {

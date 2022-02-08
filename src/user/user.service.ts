@@ -44,4 +44,27 @@ export class UserService {
     );
     return res;
   }
+
+  async createdTokens(_address: string){
+    return (await this.userModel.aggregate([
+      { "$match": { "address": _address }},
+      { "$lookup": {
+        "from": "tokens",
+        "let": { "creatorId": "$_id" },
+        "pipeline": [{ "$match": { "$expr": { "$eq": ["$creator", "$$creatorId"] }}}],
+        "as": "createdTokens"
+      }}
+    ]))[0].createdTokens;
+  }
+  async ownedTokens(_address: string){
+    return (await this.userModel.aggregate([
+      { "$match": { "address": _address }},
+      { "$lookup": {
+        "from": "tokens",
+        "let": { "ownerId": "$_id" },
+        "pipeline": [{ "$match": { "$expr": { "$eq": ["$owner", "$$ownerId"] }}}],
+        "as": "ownedTokens"
+      }}
+    ]))[0].ownedTokens;
+  }
 }

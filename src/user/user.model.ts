@@ -18,6 +18,7 @@ export class User {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Token' }] })
   @Field(() => [Token], { nullable: true })
   tokens: Token[];
+
 }
 
 export const UserModel = SchemaFactory.createForClass(User);
