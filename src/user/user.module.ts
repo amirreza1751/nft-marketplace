@@ -20,8 +20,8 @@ import { KollectionModule } from '../kollection/kollection.module';
       { name: Token.name, schema: TokenModel },
       { name: Kollection.name, schema: KollectionModel },
       {name: Event.name, schema:EventModel}
-    ]),
-    TokenModule,
+    ], 'ronia'),
+    forwardRef(() => TokenModule),
     UserModule,
     KollectionModule
   ],

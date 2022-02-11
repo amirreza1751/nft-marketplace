@@ -17,7 +17,9 @@ import { BuyNowModule } from './buy-now/buy-now.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017'),
+    MongooseModule.forRoot('mongodb://127.0.0.1:27017/roniaDB', {
+      connectionName: 'ronia',
+    }),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
     }),

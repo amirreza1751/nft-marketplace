@@ -1,6 +1,6 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Connection, Model } from 'mongoose';
 import { BuyNow, BuyNowDocument } from './buyNow.model';
 import * as NFTMarket from '../contracts/NFTMarket.json';
 import {SoftDeleteModel} from "soft-delete-plugin-mongoose";
@@ -19,6 +19,7 @@ export class BuyNowService implements OnApplicationBootstrap{
     private marketContract;
     constructor(
         @InjectModel(BuyNow.name) private buyNowModel: SoftDeleteModel<BuyNowDocument>,
+        @InjectConnection('ronia') private connection: Connection,
         private readonly userService: UserService,
         private readonly tokenService: TokenService,
         private readonly erc20Service: Erc20Service,
@@ -42,6 +43,10 @@ export class BuyNowService implements OnApplicationBootstrap{
         this.ws = new Web3WsProvider(process.env.NETWORK_WEBSOCKET_URL, options);
         this.web3 = new Web3();
         this.web3.setProvider(this.ws)
+        this.marketContract = new this.web3.eth.Contract(
+          NFTMarket.abi,
+          process.env.RONIA_MARKET,
+        );
     }
     async onApplicationBootstrap(){
         this.listenBuyNowItemCreated();
@@ -83,12 +88,7 @@ export class BuyNowService implements OnApplicationBootstrap{
     }
 
     async listenBuyNowItemCreated() {
-        console.log("Listening to BuyNowItemCreated...")  
-        this.marketContract = new this.web3.eth.Contract(
-          NFTMarket.abi,
-          process.env.RONIA_MARKET,
-        );
-    
+        console.log("Listening to BuyNowItemCreated...")
         this.marketContract.events.BuyNowItemCreated().on("data", async(buynowItemCreatedEvent) => {
           this.doListenBuyNowItemCreated(buynowItemCreatedEvent)
         });
@@ -108,6 +108,7 @@ export class BuyNowService implements OnApplicationBootstrap{
 
     async doListenBuyNowItemCreated(buyNowItemCreatedEvent){
             console.log('Buy now item created: ' + buyNowItemCreatedEvent.returnValues.itemId);
+            console.log(buyNowItemCreatedEvent);
             let seller = await this.userService.findOrCreateByAddress(buyNowItemCreatedEvent.returnValues.seller);
             let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT)
             let kollectionTokens = (await kollection.populate('tokens', 'tokenId')).tokens
@@ -137,12 +138,7 @@ export class BuyNowService implements OnApplicationBootstrap{
     }
 
     async listenBuyNowItemUpdated() {
-        console.log("Listening to BuyNowItemUpdated...") 
-        this.marketContract = new this.web3.eth.Contract(
-          NFTMarket.abi,
-          process.env.RONIA_MARKET,
-        );
-    
+        console.log("Listening to BuyNowItemUpdated...")
         this.marketContract.events.BuyNowItemUpdated().on("data", async(buyNowItemUpdatedEvent) => {
           this.doListenBuyNowItemUpdated(buyNowItemUpdatedEvent)
         });
@@ -167,12 +163,7 @@ export class BuyNowService implements OnApplicationBootstrap{
     }
 
     async listenBuyNowItemPurchased() {
-        console.log("Listening to BuyNowItemPurchased...") 
-        this.marketContract = new this.web3.eth.Contract(
-          NFTMarket.abi,
-          process.env.RONIA_MARKET,
-        );
-    
+        console.log("Listening to BuyNowItemPurchased...")
         this.marketContract.events.BuyNowItemPurchased().on("data", async(buyNowItemPurchasedEvent) => {
           this.doListenBuyNowItemPurchased(buyNowItemPurchasedEvent)
         });
@@ -198,12 +189,7 @@ export class BuyNowService implements OnApplicationBootstrap{
     }
 
     async listenBuyNowItemCanceled() {
-        console.log("Listening to BuyNowItemCanceled...") 
-        this.marketContract = new this.web3.eth.Contract(
-          NFTMarket.abi,
-          process.env.RONIA_MARKET,
-        );
-    
+        console.log("Listening to BuyNowItemCanceled...")
         this.marketContract.events.BuyNowItemCanceled().on("data", async(buyNowItemCanceledEvent) => {
           this.doListenBuyNowItemCanceled(buyNowItemCanceledEvent)
         });

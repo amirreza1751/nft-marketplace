@@ -1,4 +1,6 @@
 import { Resolver, Query, ResolveField, Parent, Args, Field } from '@nestjs/graphql';
+import { Auction } from 'src/auction/auction.model';
+import { BuyNow } from 'src/buy-now/buyNow.model';
 import { Token } from '../token/token.model';
 import { TokenService } from '../token/token.service';
 import { FindUserByAddressInput, FindUserInput, User } from './user.model';
@@ -34,6 +36,16 @@ export class UserResolver {
   @ResolveField(()=> [Token])
   async createdTokens(@Parent() parent: User) {
     return this.userService.createdTokens(parent.address);
+  }
+
+  @ResolveField(()=> [Auction])
+  async createdAuctions(@Parent() parent: User) {
+    return this.userService.createdAuctions(parent.address);
+  }
+
+  @ResolveField(()=> [BuyNow])
+  async createdBuyNowItems(@Parent() parent: User) {
+    return this.userService.createdBuyNowItems(parent.address);
   }
 
   @ResolveField()

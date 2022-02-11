@@ -12,7 +12,7 @@ import { KollectionModule } from '../kollection/kollection.module';
   imports: [
     MongooseModule.forFeature([
       { name: BuyNow.name, schema: BuyNowModel },
-    ]),
+    ], 'ronia'),
     UserModule,
     TokenModule,
     Erc20Module,

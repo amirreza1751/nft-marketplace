@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Connection, Model } from 'mongoose';
 import { Erc20, Erc20Document } from './erc20.model';
 
 @Injectable()
 export class Erc20Service {
   constructor(
     @InjectModel(Erc20.name) private erc20Model: Model<Erc20Document>,
+    @InjectConnection('ronia') private connection: Connection,
   ) {}
 
   async findById(id) {

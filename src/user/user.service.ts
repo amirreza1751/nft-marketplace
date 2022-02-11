@@ -1,11 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Connection, Model } from 'mongoose';
 import { User, UserDocument, UserModel } from './user.model';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectConnection('ronia') private connection: Connection,
+  ) {}
 
   async findById(id) {
     return this.userModel.findById(id).lean();
@@ -56,6 +59,7 @@ export class UserService {
       }}
     ]))[0].createdTokens;
   }
+
   async ownedTokens(_address: string){
     return (await this.userModel.aggregate([
       { "$match": { "address": _address }},
@@ -66,5 +70,29 @@ export class UserService {
         "as": "ownedTokens"
       }}
     ]))[0].ownedTokens;
+  }
+
+  async createdAuctions(_address: string){
+    return (await this.userModel.aggregate([
+      { "$match": { "address": _address }},
+      { "$lookup": {
+        "from": "auctions",
+        "let": { "sellerId": "$_id" },
+        "pipeline": [{ "$match": { "$expr": { "$eq": ["$seller", "$$sellerId"] }}}],
+        "as": "createdAuctions"
+      }}
+    ]))[0].createdAuctions;
+  }
+
+  async createdBuyNowItems(_address: string){
+    return (await this.userModel.aggregate([
+      { "$match": { "address": _address }},
+      { "$lookup": {
+        "from": "buynows",
+        "let": { "sellerId": "$_id" },
+        "pipeline": [{ "$match": { "$expr": { "$eq": ["$seller", "$$sellerId"] }}}],
+        "as": "createdBuyNowItems"
+      }}
+    ]))[0].createdBuyNowItems;
   }
 }

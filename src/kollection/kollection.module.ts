@@ -20,8 +20,8 @@ import { EventModule } from '../event/event.module';
       { name: Token.name, schema: TokenModel },
       { name: User.name, schema: UserModel },
       {name: Event.name, schema:EventModel}
-    ]),
-    TokenModule,
+    ], 'ronia'),
+    forwardRef(() => TokenModule),
     forwardRef(() => UserModule),
     EventModule
   ],

@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Connection, Model } from 'mongoose';
 import { Kollection, KollectionDocument } from './kollection.model';
 
 @Injectable()
 export class KollectionService {
-    constructor(@InjectModel(Kollection.name) private kollectionModel: Model<KollectionDocument>){}
+    constructor(
+        @InjectModel(Kollection.name) private kollectionModel: Model<KollectionDocument>,
+        @InjectConnection('ronia') private connection: Connection,
+        ){}
 
     async findMany() {
         return this.kollectionModel.find().lean();

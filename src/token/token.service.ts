@@ -1,5 +1,5 @@
 import {
-  Injectable, OnApplicationBootstrap
+  Injectable, OnApplicationBootstrap, OnModuleInit
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -9,6 +9,9 @@ import * as NFT from '../contracts/NFT.json';
 import { KollectionService } from '../kollection/kollection.service';
 import { EventService } from '../event/event.service';
 import { Event } from '../event/event.model';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
+
 var Web3 = require('web3');
 var Web3WsProvider = require('web3-providers-ws');
 @Injectable()
@@ -19,6 +22,7 @@ export class TokenService implements OnApplicationBootstrap{
 
   constructor(
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
+    @InjectConnection('ronia') private connection: Connection,
     private userService: UserService,
     private kollectionService: KollectionService,
     private eventService: EventService
@@ -38,10 +42,15 @@ export class TokenService implements OnApplicationBootstrap{
     this.ws = new Web3WsProvider(process.env.NETWORK_WEBSOCKET_URL, options);
     this.web3 = new Web3();
     this.web3.setProvider(this.ws)
+    this.tokenContract = new this.web3.eth.Contract(
+      NFT.abi,
+      process.env.RONIA_NFT
+    );
   }
   async onApplicationBootstrap(){
     this.listenTransfer()
   }
+
   async findMany(options?) {
     return this.tokenModel.find(options).lean();
   }
@@ -59,10 +68,7 @@ export class TokenService implements OnApplicationBootstrap{
   }
 
   async listenTransfer() {
-    this.tokenContract = new this.web3.eth.Contract(
-      NFT.abi,
-      process.env.RONIA_NFT
-    );
+    
     console.log('Listening to Transfer ...');
     this.tokenContract.events.Transfer().on("data", async(transferEvent) => {
       await this.doListenTransfer(transferEvent)
@@ -128,11 +134,12 @@ export class TokenService implements OnApplicationBootstrap{
   }
   async indexTransfers(){
     console.log('Indexing Transfer ...');
-    this.tokenContract.getPastEvents('Transfer', {
+    await this.tokenContract.getPastEvents('Transfer', {
       fromBlock: process.env.FROM_BLOCK,
       toBlock: 'latest'
     }, async (error, events) => { 
       for(let i=0; i < events.length; i++){
+        console.log(events[i])
         await this.doListenTransfer(events[i])
       }
      })

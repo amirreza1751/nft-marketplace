@@ -5,7 +5,7 @@ import { Erc20Service } from './erc20.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Erc20.name, schema: Erc20Model }]),
+    MongooseModule.forFeature([{ name: Erc20.name, schema: Erc20Model }], 'ronia'),
   ],
   providers: [Erc20Service],
   exports: [

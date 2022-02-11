@@ -1,40 +1,36 @@
 import { NestFactory } from '@nestjs/core';
-import { AuctionService } from '../auction/auction.service';
-import { AppModule } from '../app.module';
+import { TokenModule } from '../token/token.module';
 import { TokenService } from '../token/token.service';
+import { AppModule } from '../app.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Mongoose } from 'mongoose';
+import { AuctionModule } from '../auction/auction.module';
+import { AuctionService } from '../auction/auction.service';
+import { BuyNowModule } from '../buy-now/buy-now.module';
 import { BuyNowService } from '../buy-now/buy-now.service';
 
 async function bootstrap() {
-  const application = await NestFactory.createApplicationContext(AppModule);
+  const app = await NestFactory.createApplicationContext(AppModule,);
 
-  const command = process.argv[2];
 
-  switch (command) {
-    case 'index':
-      const tokenService = application.get(TokenService);
-      await tokenService.indexTransfers();
+  await app.select(AppModule).select(TokenModule).get(TokenService).indexTransfers();
+  
+  const auctionService =  app.select(AppModule).select(AuctionModule).get(AuctionService);
+  await auctionService.indexAuctionCreated();
+  await auctionService.indexAuctionBidded();
+  await auctionService.indexAuctionUpdated();
+  await auctionService.indexAuctionDurationExtended();
+  await auctionService.indexAuctionEnded();
+  await auctionService.indexAuctionCanceled();
 
-      const auctionService = application.get(AuctionService);
-      await auctionService.indexAuctionCreated();
-      await auctionService.indexAuctionBidded();
-      await auctionService.indexAuctionDurationExtended();
-      await auctionService.indexAuctionUpdated();
-      await auctionService.indexAuctionEnded();
+  const buyNowService =  app.select(AppModule).select(BuyNowModule).get(BuyNowService);
+  await buyNowService.indexBuyNowItemCreated();
+  await buyNowService.indexBuyNowItemUpdated();
+  await buyNowService.indexBuyNowItemPurchased();
+  await buyNowService.indexBuyNowItemCanceled();
 
-      const buyNowService = application.get(BuyNowService)
-      await buyNowService.indexBuyNowItemCreated();
-      await buyNowService.indexBuyNowItemUpdated();
-      await buyNowService.indexBuyNowItemPurchased();
-      await buyNowService.indexBuyNowItemCanceled();
-      
-      break;
-    default:
-      console.log('Command not found');
-      process.exit(1);
-  }
-
-  await application.close();
-  process.exit(0);
+//   await app.close();
+//   process.exit(0);
 }
 
 bootstrap();

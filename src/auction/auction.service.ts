@@ -1,7 +1,7 @@
 import { flatten, Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ethers } from 'ethers';
-import { Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { Auction, AuctionDocument, AuctionModel } from './auction.model';
 import * as NFTMarket from '../contracts/NFTMarket.json';
 import { UserService } from '../user/user.service';
@@ -21,6 +21,7 @@ export class AuctionService implements OnApplicationBootstrap{
 
   constructor(
     @InjectModel(Auction.name) private auctionModel: SoftDeleteModel<AuctionDocument>,
+    @InjectConnection('ronia') private connection: Connection,
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly erc20Service: Erc20Service,
@@ -44,6 +45,10 @@ export class AuctionService implements OnApplicationBootstrap{
   this.ws = new Web3WsProvider(process.env.NETWORK_WEBSOCKET_URL, options);
   this.web3 = new Web3();
   this.web3.setProvider(this.ws)
+  this.marketContract = new this.web3.eth.Contract(
+    NFTMarket.abi,
+    process.env.RONIA_MARKET,
+  );
   }
   async onApplicationBootstrap(){
     this.listenAuctionCreated()
@@ -87,11 +92,6 @@ export class AuctionService implements OnApplicationBootstrap{
 }
 
   async listenAuctionCreated() {
-    this.marketContract = new this.web3.eth.Contract(
-      NFTMarket.abi,
-      process.env.RONIA_MARKET,
-    );
-
     console.log('Listening to AuctionCreated ...');
     this.marketContract.events.AuctionCreated().on("data", async(auctionCreatedEvent) => {
       this.doListenAuctionCreated(auctionCreatedEvent)
@@ -145,11 +145,6 @@ export class AuctionService implements OnApplicationBootstrap{
   }
   
   async listenAuctionBidded(){
-    this.marketContract = new this.web3.eth.Contract(
-      NFTMarket.abi,
-      process.env.RONIA_MARKET,
-    );
-
     console.log('Listening to AuctionBidded...');
     this.marketContract.events.AuctionBidded().on("data", async (auctionBiddedEvent)=>{
         this.doListenAuctionBidded(auctionBiddedEvent)
@@ -179,11 +174,6 @@ export class AuctionService implements OnApplicationBootstrap{
 
   
   async listenAuctionDurationExtended(){
-    this.marketContract = new this.web3.eth.Contract(
-      NFTMarket.abi,
-      process.env.RONIA_MARKET,
-    );
-
     console.log('Listening to AuctionDurationExtended...');
     this.marketContract.events.AuctionDurationExtended().on("data", async (auctionDurationExtendedEvent)=>{
         this.doListenAuctionDurationExtended(auctionDurationExtendedEvent)
@@ -210,11 +200,6 @@ export class AuctionService implements OnApplicationBootstrap{
   }
   
   async listenAuctionUpdated(){
-    this.marketContract = new this.web3.eth.Contract(
-      NFTMarket.abi,
-      process.env.RONIA_MARKET,
-    );
-
     console.log('Listening to AuctionUpdated...');
     this.marketContract.events.AuctionUpdated().on("data", async (auctionUpdatedEvent)=>{
       this.doListenAuctionUpdated(auctionUpdatedEvent)
@@ -240,11 +225,6 @@ export class AuctionService implements OnApplicationBootstrap{
   }
   
   async listenAuctionEnded(){
-    this.marketContract = new this.web3.eth.Contract(
-      NFTMarket.abi,
-      process.env.RONIA_MARKET,
-    );
-
     console.log('Listening to AuctionEnded...');
     this.marketContract.events.AuctionEnded().on("data", async (auctionEndedEvent)=>{
       this.doListenAuctionEnded(auctionEndedEvent)
@@ -270,12 +250,7 @@ export class AuctionService implements OnApplicationBootstrap{
   }
 
   async listenAuctionCanceled() {
-    console.log("Listening to AuctionCanceled...") 
-    this.marketContract = new this.web3.eth.Contract(
-      NFTMarket.abi,
-      process.env.RONIA_MARKET,
-    );
-
+    console.log("Listening to AuctionCanceled...")
     this.marketContract.events.AuctionCanceled().on("data", async(auctionCanceledEvent) => {
       this.doListenAuctionCanceled(auctionCanceledEvent)
     });

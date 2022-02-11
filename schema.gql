@@ -8,6 +8,8 @@ type User {
   tokens: [Token!]
   ownedTokens: [Token!]!
   createdTokens: [Token!]!
+  createdAuctions: [Auction!]!
+  createdBuyNowItems: [BuyNow!]!
 }
 
 type Event {
@@ -60,11 +62,20 @@ type Auction {
   auctionCurrency: Erc20
 }
 
+type BuyNow {
+  _id: ID!
+  itemId: String
+  seller: User
+  token: Token
+  winner: User
+  purchasedAt: Float
+  reservePrice: Float
+  currency: Erc20
+}
+
 type Query {
   tokens: [Token!]!
   token(input: FindTokenInput!): Token!
-  auctions: [Auction!]!
-  auction(input: FindAuctionInput!): Auction!
   users: [User!]!
   user(input: FindUserInput!): User!
   userByAddress(input: FindUserByAddressInput!): User!
@@ -72,13 +83,13 @@ type Query {
   kollection(input: FindKollectionInput!): Kollection!
   events: [Event!]!
   event(input: FindEventInput!): Event!
+  auctions: [Auction!]!
+  auction(input: FindAuctionInput!): Auction!
+  buyNowItems: [BuyNow!]!
+  buyNowItem(input: FindBuyNowInput!): BuyNow!
 }
 
 input FindTokenInput {
-  _id: String!
-}
-
-input FindAuctionInput {
   _id: String!
 }
 
@@ -95,5 +106,13 @@ input FindKollectionInput {
 }
 
 input FindEventInput {
+  _id: String!
+}
+
+input FindAuctionInput {
+  _id: String!
+}
+
+input FindBuyNowInput {
   _id: String!
 }
