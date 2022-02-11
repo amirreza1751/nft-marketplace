@@ -52,7 +52,7 @@ export class TokenService implements OnApplicationBootstrap{
   }
 
   async findMany(options?) {
-    return this.tokenModel.find(options).lean();
+    return this.tokenModel.find(options);
   }
 
   async findById(id) {
@@ -99,11 +99,12 @@ export class TokenService implements OnApplicationBootstrap{
       createdEvent.to = owner;
       
       if(kollectionToken){
-        kollectionToken.owner = owner
-        if(!kollectionToken.events)
-          kollectionToken.events = [createdEvent]
-        else kollectionToken.events.push(createdEvent)
-        var res = kollectionToken
+        let existingToken = await this.findById(kollectionToken._id)
+        existingToken.owner = owner
+        if(!existingToken.events)
+        existingToken.events = [createdEvent]
+        else existingToken.events.push(createdEvent)
+        var res = await existingToken.save()
       } else{
         let createdToken: Token = new Token();
         createdToken.tokenId = transferEvent.returnValues.tokenId;

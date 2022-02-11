@@ -3,7 +3,6 @@ import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 import { BuyNow, BuyNowDocument } from './buyNow.model';
 import * as NFTMarket from '../contracts/NFTMarket.json';
-import {SoftDeleteModel} from "soft-delete-plugin-mongoose";
 import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { Erc20Service } from '../erc20/erc20.service';
@@ -18,7 +17,7 @@ export class BuyNowService implements OnApplicationBootstrap{
     private web3;
     private marketContract;
     constructor(
-        @InjectModel(BuyNow.name) private buyNowModel: SoftDeleteModel<BuyNowDocument>,
+        @InjectModel(BuyNow.name) private buyNowModel: Model<BuyNowDocument>,
         @InjectConnection('ronia') private connection: Connection,
         private readonly userService: UserService,
         private readonly tokenService: TokenService,
@@ -83,7 +82,7 @@ export class BuyNowService implements OnApplicationBootstrap{
     async removeByItemId(id: string) {
         const filter  = { itemId: id };
     
-        const deleted = await this.buyNowModel.softDelete(filter);
+        const deleted = await this.buyNowModel.deleteOne(filter);
         return deleted;
     }
 
@@ -182,7 +181,8 @@ export class BuyNowService implements OnApplicationBootstrap{
 
     async doListenBuyNowItemPurchased(buyNowItemPurchasedEvent){
         let buyNowItem = await this.findOrCreateByItemId(buyNowItemPurchasedEvent.returnValues.itemId);
-        buyNowItem.winner = buyNowItemPurchasedEvent.returnValues.winner;
+        let winner = await this.userService.findOrCreateByAddress(buyNowItemPurchasedEvent.returnValues.winner);
+        buyNowItem.winner = winner;
         buyNowItem.purchasedAt = buyNowItemPurchasedEvent.returnValues.purchasedAt;
         buyNowItem.save();
     }
