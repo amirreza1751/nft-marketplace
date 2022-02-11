@@ -139,7 +139,6 @@ export class TokenService implements OnApplicationBootstrap{
       toBlock: 'latest'
     }, async (error, events) => { 
       for(let i=0; i < events.length; i++){
-        console.log(events[i])
         await this.doListenTransfer(events[i])
       }
      })

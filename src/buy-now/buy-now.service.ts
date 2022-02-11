@@ -108,7 +108,6 @@ export class BuyNowService implements OnApplicationBootstrap{
 
     async doListenBuyNowItemCreated(buyNowItemCreatedEvent){
             console.log('Buy now item created: ' + buyNowItemCreatedEvent.returnValues.itemId);
-            console.log(buyNowItemCreatedEvent);
             let seller = await this.userService.findOrCreateByAddress(buyNowItemCreatedEvent.returnValues.seller);
             let kollection = await this.kollectionService.findOrCreateByContract(process.env.RONIA_NFT)
             let kollectionTokens = (await kollection.populate('tokens', 'tokenId')).tokens
