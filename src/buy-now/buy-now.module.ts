@@ -10,18 +10,16 @@ import { KollectionModule } from '../kollection/kollection.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: BuyNow.name, schema: BuyNowModel },
-    ], 'ronia'),
+    MongooseModule.forFeature(
+      [{ name: BuyNow.name, schema: BuyNowModel }],
+      'ronia',
+    ),
     UserModule,
     TokenModule,
     Erc20Module,
-    KollectionModule
+    KollectionModule,
   ],
   providers: [BuyNowService, BuyNowResolver],
-  exports: [
-    BuyNowResolver,
-    BuyNowService,
-  ]
+  exports: [BuyNowResolver, BuyNowService],
 })
 export class BuyNowModule {}

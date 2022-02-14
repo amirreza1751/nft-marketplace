@@ -1,4 +1,11 @@
-import { Resolver, Query, ResolveField, Parent, Args, Field } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  ResolveField,
+  Parent,
+  Args,
+  Field,
+} from '@nestjs/graphql';
 import { Auction } from 'src/auction/auction.model';
 import { BuyNow } from 'src/buy-now/buyNow.model';
 import { Token } from '../token/token.model';
@@ -25,31 +32,31 @@ export class UserResolver {
 
   @Query(() => User)
   async userByAddress(@Args('input') { address }: FindUserByAddressInput) {
-    return this.userService.findByAddress(address)
+    return this.userService.findByAddress(address);
   }
-  
-  @ResolveField(()=> [Token])
+
+  @ResolveField(() => [Token])
   async ownedTokens(@Parent() parent: User) {
     return this.userService.ownedTokens(parent.address);
   }
 
-  @ResolveField(()=> [Token])
+  @ResolveField(() => [Token])
   async createdTokens(@Parent() parent: User) {
     return this.userService.createdTokens(parent.address);
   }
 
-  @ResolveField(()=> [Auction])
+  @ResolveField(() => [Auction])
   async createdAuctions(@Parent() parent: User) {
     return this.userService.createdAuctions(parent.address);
   }
 
-  @ResolveField(()=> [BuyNow])
+  @ResolveField(() => [BuyNow])
   async createdBuyNowItems(@Parent() parent: User) {
     return this.userService.createdBuyNowItems(parent.address);
   }
 
   @ResolveField()
   async tokens(@Parent() parent: User) {
-    return this.tokenService.findMany({owner: parent});
+    return this.tokenService.findMany({ owner: parent });
   }
 }

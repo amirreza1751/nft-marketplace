@@ -22,28 +22,25 @@ import { EventModule } from '../event/event.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Auction.name, schema: AuctionModel },
-      { name: User.name, schema: UserModel },
-      { name: Erc20.name, schema: Erc20Model },
-      { name: Token.name, schema: TokenModel },
-      { name: Kollection.name, schema: KollectionModel },
-      {name: Event.name, schema: EventModel}
-    ], 'ronia'),
+    MongooseModule.forFeature(
+      [
+        { name: Auction.name, schema: AuctionModel },
+        { name: User.name, schema: UserModel },
+        { name: Erc20.name, schema: Erc20Model },
+        { name: Token.name, schema: TokenModel },
+        { name: Kollection.name, schema: KollectionModel },
+        { name: Event.name, schema: EventModel },
+      ],
+      'ronia',
+    ),
     TokenModule,
     UserModule,
     Erc20Module,
     KollectionModule,
-    EventModule
+    EventModule,
   ],
-  providers: [
-    AuctionService,
-    AuctionResolver,
-  ],
+  providers: [AuctionService, AuctionResolver],
   controllers: [AuctionController],
-  exports: [
-    AuctionService,
-    AuctionResolver,
-  ]
+  exports: [AuctionService, AuctionResolver],
 })
 export class AuctionModule {}

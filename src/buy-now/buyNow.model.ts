@@ -5,7 +5,6 @@ import { Erc20 } from '../erc20/erc20.model';
 import { Token } from '../token/token.model';
 import { User } from '../user/user.model';
 
-
 export type BuyNowDocument = BuyNow & mongoose.Document;
 @Schema()
 @ObjectType()

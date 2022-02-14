@@ -14,6 +14,7 @@ import { Erc20Module } from './erc20/erc20.module';
 import { KollectionModule } from './kollection/kollection.module';
 import { EventModule } from './event/event.module';
 import { BuyNowModule } from './buy-now/buy-now.module';
+import { BidModule } from './bid/bid.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { BuyNowModule } from './buy-now/buy-now.module';
     KollectionModule,
     EventModule,
     BuyNowModule,
+    BidModule,
     // UserShareModule
   ],
   controllers: [AppController],

@@ -8,29 +8,29 @@ export type EventDocument = Event & mongoose.Document;
 
 @Schema()
 @ObjectType()
-export class Event{
-    @Field(() => ID)
-    _id: number;
+export class Event {
+  @Field(() => ID)
+  _id: number;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    @Field(() => User, { nullable: true })
-    from: User;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+  @Field(() => User, { nullable: true })
+  from: User;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    @Field(() => User, { nullable: true })
-    to: User;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+  @Field(() => User, { nullable: true })
+  to: User;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Token' })
-    @Field(() => Token, { nullable: true })
-    token: Token;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Token' })
+  @Field(() => Token, { nullable: true })
+  token: Token;
 
-    @Prop()
-    @Field({ nullable: true })
-    price: number;
+  @Prop()
+  @Field({ nullable: true })
+  price: number;
 
-    @Prop()
-    @Field({ nullable: true })
-    txHash: string;
+  @Prop()
+  @Field({ nullable: true })
+  txHash: string;
 }
 export const EventModel = SchemaFactory.createForClass(Event);
 

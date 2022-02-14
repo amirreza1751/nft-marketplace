@@ -15,18 +15,21 @@ import { KollectionModule } from '../kollection/kollection.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserModel },
-      { name: Token.name, schema: TokenModel },
-      { name: Kollection.name, schema: KollectionModel },
-      {name: Event.name, schema:EventModel}
-    ], 'ronia'),
+    MongooseModule.forFeature(
+      [
+        { name: User.name, schema: UserModel },
+        { name: Token.name, schema: TokenModel },
+        { name: Kollection.name, schema: KollectionModel },
+        { name: Event.name, schema: EventModel },
+      ],
+      'ronia',
+    ),
     forwardRef(() => TokenModule),
     UserModule,
-    KollectionModule
+    KollectionModule,
   ],
   providers: [UserService, UserResolver],
   controllers: [UserController],
-  exports: [UserService, UserResolver]
+  exports: [UserService, UserResolver],
 })
 export class UserModule {}

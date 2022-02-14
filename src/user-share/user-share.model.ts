@@ -7,7 +7,6 @@ export type UserShareDocument = UserShare & mongoose.Document;
 @Schema()
 @ObjectType()
 export class UserShare {
-  
   @Field(() => ID)
   _id: number;
 

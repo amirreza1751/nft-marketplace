@@ -19,10 +19,10 @@ export class Erc20Service {
   }
 
   async findOrCreateByAddress(_address: string) {
-    let res = await this.erc20Model.findOne({address: _address})
-    if(!res){
-      res = await this.erc20Model.create({address: _address})
+    let res = await this.erc20Model.findOne({ address: _address });
+    if (!res) {
+      res = await this.erc20Model.create({ address: _address });
     }
-    return res
+    return res;
   }
 }

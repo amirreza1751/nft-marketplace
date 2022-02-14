@@ -10,12 +10,18 @@ import { BuyNowModule } from '../buy-now/buy-now.module';
 import { BuyNowService } from '../buy-now/buy-now.service';
 
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule,);
+  const app = await NestFactory.createApplicationContext(AppModule);
 
+  await app
+    .select(AppModule)
+    .select(TokenModule)
+    .get(TokenService)
+    .indexTransfers();
 
-  await app.select(AppModule).select(TokenModule).get(TokenService).indexTransfers();
-  
-  const auctionService =  app.select(AppModule).select(AuctionModule).get(AuctionService);
+  const auctionService = app
+    .select(AppModule)
+    .select(AuctionModule)
+    .get(AuctionService);
   await auctionService.indexAuctionCreated();
   await auctionService.indexAuctionBidded();
   await auctionService.indexAuctionUpdated();
@@ -23,14 +29,17 @@ async function bootstrap() {
   await auctionService.indexAuctionEnded();
   await auctionService.indexAuctionCanceled();
 
-  const buyNowService =  app.select(AppModule).select(BuyNowModule).get(BuyNowService);
+  const buyNowService = app
+    .select(AppModule)
+    .select(BuyNowModule)
+    .get(BuyNowService);
   await buyNowService.indexBuyNowItemCreated();
   await buyNowService.indexBuyNowItemUpdated();
   await buyNowService.indexBuyNowItemPurchased();
   await buyNowService.indexBuyNowItemCanceled();
 
-//   await app.close();
-//   process.exit(0);
+    // await app.close();
+    // process.exit(0);
 }
 
 bootstrap();

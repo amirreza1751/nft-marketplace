@@ -19,18 +19,21 @@ import { EventModule } from '../event/event.module';
     MongooseModule.forRoot('mongodb://127.0.0.1:27017/ronia', {
       connectionName: 'ronia',
     }),
-    MongooseModule.forFeature([
-      { name: Token.name, schema: TokenModel },
-      { name: User.name, schema: UserModel },
-      { name: Kollection.name, schema: KollectionModel },
-      { name: Event.name, schema: EventModel },
-    ], 'ronia'),
+    MongooseModule.forFeature(
+      [
+        { name: Token.name, schema: TokenModel },
+        { name: User.name, schema: UserModel },
+        { name: Kollection.name, schema: KollectionModel },
+        { name: Event.name, schema: EventModel },
+      ],
+      'ronia',
+    ),
     forwardRef(() => UserModule),
     KollectionModule,
-    EventModule
+    EventModule,
   ],
   providers: [TokenResolver, TokenService],
   controllers: [TokenController],
-  exports: [TokenResolver, TokenService]
+  exports: [TokenResolver, TokenService],
 })
 export class TokenModule {}

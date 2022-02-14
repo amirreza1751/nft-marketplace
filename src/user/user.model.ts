@@ -7,7 +7,6 @@ export type UserDocument = User & mongoose.Document;
 @Schema()
 @ObjectType()
 export class User {
-  
   @Field(() => ID)
   _id: number;
 
@@ -18,7 +17,6 @@ export class User {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Token' }] })
   @Field(() => [Token], { nullable: true })
   tokens: Token[];
-
 }
 
 export const UserModel = SchemaFactory.createForClass(User);

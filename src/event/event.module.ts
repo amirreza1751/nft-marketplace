@@ -15,20 +15,20 @@ import { KollectionModule } from '../kollection/kollection.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Event.name, schema: EventModel },
-      { name: Token.name, schema: TokenModel },
-      { name: User.name, schema: UserModel },
-      { name: Kollection.name, schema: KollectionModel },
-    ], 'ronia'),
+    MongooseModule.forFeature(
+      [
+        { name: Event.name, schema: EventModel },
+        { name: Token.name, schema: TokenModel },
+        { name: User.name, schema: UserModel },
+        { name: Kollection.name, schema: KollectionModel },
+      ],
+      'ronia',
+    ),
     forwardRef(() => TokenModule),
     forwardRef(() => UserModule),
-    forwardRef(() => KollectionModule)
+    forwardRef(() => KollectionModule),
   ],
   providers: [EventService, EventResolver],
-  exports: [
-    EventService,
-    EventResolver,
-  ]
+  exports: [EventService, EventResolver],
 })
 export class EventModule {}

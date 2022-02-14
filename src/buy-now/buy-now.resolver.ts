@@ -10,22 +10,22 @@ import { BuyNow, FindBuyNowInput } from './buyNow.model';
 
 @Resolver(() => BuyNow)
 export class BuyNowResolver {
-    constructor(
-        private readonly buyNowService: BuyNowService,
-        private readonly erc20Service: Erc20Service,
-        private readonly userService: UserService,
-        private readonly tokenService: TokenService,
-      ) {}
+  constructor(
+    private readonly buyNowService: BuyNowService,
+    private readonly erc20Service: Erc20Service,
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService,
+  ) {}
 
-    @Query(() => [BuyNow])
-    async buyNowItems() {
-        return this.buyNowService.findMany();
-    }
+  @Query(() => [BuyNow])
+  async buyNowItems() {
+    return this.buyNowService.findMany();
+  }
 
-    @Query(() => BuyNow)
-    async buyNowItem(@Args('input') { _id }: FindBuyNowInput) {
-        return this.buyNowService.findById(_id);
-    }
+  @Query(() => BuyNow)
+  async buyNowItem(@Args('input') { _id }: FindBuyNowInput) {
+    return this.buyNowService.findById(_id);
+  }
 
   @ResolveField(() => User)
   async seller(@Parent() buyNowItem: BuyNow) {

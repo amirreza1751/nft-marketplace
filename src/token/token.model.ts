@@ -10,7 +10,6 @@ export type TokenDocument = Token & mongoose.Document;
 @Schema()
 @ObjectType()
 export class Token {
-  
   @Field(() => ID)
   _id: number;
 

@@ -25,10 +25,10 @@ describe('EventService', () => {
         ]),
         TokenModule,
         forwardRef(() => UserModule),
-        forwardRef(() => KollectionModule)
+        forwardRef(() => KollectionModule),
       ],
       providers: [EventService, EventResolver],
-        }).compile();
+    }).compile();
 
     service = module.get<EventService>(EventService);
   });

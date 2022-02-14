@@ -6,24 +6,23 @@ import { KollectionService } from './kollection.service';
 
 @Resolver(() => Kollection)
 export class KollectionResolver {
-    
-    constructor(
-        private kollectionService: KollectionService,
-        private tokenService: TokenService
-    ){}
+  constructor(
+    private kollectionService: KollectionService,
+    private tokenService: TokenService,
+  ) {}
 
-    @Query(() => [Kollection])
-    async kollections(){
-        return this.kollectionService.findMany()
-    }
+  @Query(() => [Kollection])
+  async kollections() {
+    return this.kollectionService.findMany();
+  }
 
-    @Query(() => Kollection)
-    async kollection(@Args('input') {_id}: FindKollectionInput){
-        return this.kollectionService.findById(_id)
-    }
+  @Query(() => Kollection)
+  async kollection(@Args('input') { _id }: FindKollectionInput) {
+    return this.kollectionService.findById(_id);
+  }
 
-    @ResolveField()
-    async tokens(@Parent() _kollection: Kollection){
-        return this.tokenService.findMany({kollection: _kollection})
-    }
+  @ResolveField()
+  async tokens(@Parent() _kollection: Kollection) {
+    return this.tokenService.findMany({ kollection: _kollection });
+  }
 }

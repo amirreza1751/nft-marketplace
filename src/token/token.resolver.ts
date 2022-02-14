@@ -14,7 +14,7 @@ export class TokenResolver {
     private tokenService: TokenService,
     private userService: UserService,
     private kollectionService: KollectionService,
-    private eventService: EventService
+    private eventService: EventService,
   ) {}
 
   @Query(() => [Token])
@@ -39,6 +39,6 @@ export class TokenResolver {
 
   @ResolveField(() => Event)
   async events(@Parent() _token: Token) {
-    return this.eventService.findMany({token: _token});
+    return this.eventService.findMany({ token: _token });
   }
 }

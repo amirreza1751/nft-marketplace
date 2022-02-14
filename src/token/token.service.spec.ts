@@ -15,15 +15,21 @@ describe('EventService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-        imports: [
-            MongooseModule.forFeature([
-              { name: Token.name, schema: TokenModel },
-              { name: User.name, schema: UserModel },
-              { name: Kollection.name, schema: KollectionModel },
-              { name: Event.name, schema: EventModel },
-            ]),
-          ],
-          providers: [TokenResolver, TokenService, UserService, KollectionService, EventService],
+      imports: [
+        MongooseModule.forFeature([
+          { name: Token.name, schema: TokenModel },
+          { name: User.name, schema: UserModel },
+          { name: Kollection.name, schema: KollectionModel },
+          { name: Event.name, schema: EventModel },
+        ]),
+      ],
+      providers: [
+        TokenResolver,
+        TokenService,
+        UserService,
+        KollectionService,
+        EventService,
+      ],
     }).compile();
 
     service = module.get<TokenService>(TokenService);
