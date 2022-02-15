@@ -3,4 +3,4 @@ ronia-deploy:
        - ci
      script:
        - npm i
-       - npm run build
+       - /bin/systemctl start ronia-index.service
