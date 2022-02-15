@@ -3,4 +3,4 @@ ronia-deploy:
        - ci
      script:
        - npm i
-       - npm run start:prod
+       - npm run build
