@@ -4,4 +4,4 @@ ronia-deploy:
      script:
        - npm i
        - npm run build
-       - pm2 restart ronia
+       - pm2 status
