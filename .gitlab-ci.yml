@@ -5,4 +5,4 @@ ronia-deploy:
        - npm i
        - npm run build
        - python3 port-checker.py
-       - NODE_ENV=production pm2 start dist/src/main.js --name ronia
+       - NODE_ENV=production pm2 start dist/src/main.js --name ronia -f
