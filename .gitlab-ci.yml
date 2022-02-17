@@ -4,4 +4,4 @@ ronia-deploy:
      script:
        - npm i
        - npm run build
-       - pm2 status
+       - NODE_ENV=production pm2 start dist/src/main.js --name ronia
