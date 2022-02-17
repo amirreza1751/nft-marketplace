@@ -4,5 +4,5 @@ ronia-deploy:
      script:
        - npm i
        - npm run build
-       - pm2 stop ronia
+       - pm2 delete all
        - pm2 pm2 start dist/src/main.js --name ronia
