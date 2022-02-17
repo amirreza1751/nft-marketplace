@@ -3,5 +3,5 @@ ronia-deploy:
        - ci
      script:
        - npm i
-       - npm run build
-       - pm2 delete all
+       - python3 port-checker.py
+       - npm run start:prod
